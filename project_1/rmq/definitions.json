@@ -1,0 +1,53 @@
+{
+    "rabbit_version": "3.13.7",
+    "rabbitmq_version": "3.13.7",
+    "product_name": "RabbitMQ",
+    "product_version": "3.13.7",
+    "users": [],
+    "vhosts": [],
+    "permissions": [],
+    "topic_permissions": [],
+    "parameters": [],
+    "global_parameters": [],
+    "policies": [],
+    "queues": [
+      {
+        "name": "ingestion_queue",
+        "vhost": "/",
+        "durable": false,
+        "auto_delete": false
+      },
+      {
+        "name": "pattern_output_queue",
+        "vhost": "/",
+        "durable": false,
+        "auto_delete": false
+      }
+    ],
+    "exchanges": [
+        {
+            "name": "citibike_exchange",
+            "vhost": "/",
+            "type": "direct",
+            "durable": false,
+            "auto_delete": false,
+            "internal": false
+        }
+    ],
+    "bindings": [
+      {
+        "source": "citibike_exchange",
+        "vhost": "/",
+        "destination": "ingestion_queue",
+        "destination_type": "queue",
+        "routing_key": "input"
+      },
+      {
+        "source": "citibike_exchange",
+        "vhost": "/",
+        "destination": "pattern_output_queue",
+        "destination_type": "queue",
+        "routing_key": "output"
+      }
+    ]
+  }
