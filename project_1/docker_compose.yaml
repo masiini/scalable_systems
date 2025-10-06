@@ -1,10 +1,8 @@
 services:
 
   opencep-service:
-    build: ./opencep
+    image: python:3.9-alpine
     container_name: opencep
-    depends_on:
-      - rmq
     environment:
       BROKER_HOST: rmq
       BROKER_PORT: 5672
@@ -13,6 +11,10 @@ services:
       QUEUE_NAME: pattern_output_queue
       EXCHANGE_NAME: citibike_exchange
       ROUTE_KEY: output
+    working_dir: /opt/app
+    volumes:
+      - ./pattern_recogniser:/opt/app
+    command: ["/bin/sh", "-c", "pip install -r requirements.txt && python main.py"]
     ports:
       - "8080:8080"
     networks:
@@ -35,7 +37,6 @@ services:
     command: ["/bin/sh", "-c", "pip install -r requirements.txt && python ingestion.py"]
     working_dir: /opt/app
     volumes:
-      - ../requirements.txt:/opt/app/requirements.txt
       - ./data-ingestion:/opt/app
       - ./data/dataset:/datasets
     networks:
