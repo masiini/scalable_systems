@@ -62,16 +62,13 @@ class DataIngest:
             self.channel.stop_consuming()
             self.queue_connection.close()
 
-    def publish_message(self, message, route_key):
+    def publish_message(self, message):
         self.channel.basic_publish(
             exchange=EXCHANGE_NAME, 
             routing_key=ROUTE_KEY, 
-            body=message,
-            properties=pika.BasicProperties(
-                headers=headers
-            )
+            body=message
         )
-        logger.debug(f"Published message: {message}")
+        # logger.info(f"Published message: {message}")
 
 def read_large_file(file_path, chunk_size):
     for chunk in pd.read_csv(file_path, chunksize=chunk_size):
