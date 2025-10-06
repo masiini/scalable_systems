@@ -1,3 +1,10 @@
 venv
 
 */data
+
+__pycache__
+
+.vscode
+
+*.log
+/project_1/pattern_recogniser/test
