@@ -78,19 +78,28 @@ def read_large_file(file_path, chunk_size):
         yield chunk
 
 def ingestion():
-    conn_params = pika.ConnectionParameters(BROKER_HOST, 5672, '/', pika.PlainCredentials(BROKER_USER, BROKER_PASS))
-    ingestor = DataIngest(QUEUE_NAME, conn_params)
-    ingestor.connect()
-    print(ingestor.is_connected())
-    # for chunk in read_large_file(, 10):
-    #     for _, row in chunk.iterrows():
-    #         pass
-    #         # TODO: row to ride event
-    #         logger.debug(f'ROW: {type(row)} | {row}')
-    #         event = Ride()
-    #         ingestor.publish_message(event.to_json())
-    #     break # TODO: remove debug break
+    try:
+        conn_params = pika.ConnectionParameters(BROKER_HOST, 5672, '/', pika.PlainCredentials(BROKER_USER, BROKER_PASS))
+        ingestor = DataIngest(QUEUE_NAME, conn_params)
+        ingestor.connect()
 
+        for chunk in read_large_file(DATAFILE, 1000):
+            for _, row in chunk.iterrows():
+                event = Ride(
+                    row.ride_id, 
+                    row.rideable_type, 
+                    row.started_at, 
+                    row.ended_at, 
+                    row.start_station_id, 
+                    row.end_station_id
+                )
+
+                # logger.info(f'EVENT: {event.to_json()}')
+                ingestor.publish_message(event.to_json())
+            # break
+        ingestor.close_connections()
+    except Exception as e:
+        logging.error(e)
 
 if __name__ == '__main__':
     ingestion()

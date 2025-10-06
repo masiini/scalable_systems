@@ -31,13 +31,13 @@ services:
       QUEUE_NAME: ingestion_queue
       EXCHANGE_NAME: citibike_exchange
       ROUTE_KEY: input
-      DATAFILE: /datasets
+      DATAFILE: /datasets/202508-citibike-tripdata_1.csv
     command: ["/bin/sh", "-c", "pip install -r requirements.txt && python ingestion.py"]
     working_dir: /opt/app
     volumes:
       - ../requirements.txt:/opt/app/requirements.txt
       - ./data-ingestion:/opt/app
-    #   - ./data:/datasets
+      - ./data/dataset:/datasets
     networks:
       - projectnet
 
