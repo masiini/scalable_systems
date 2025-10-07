@@ -45,11 +45,14 @@ class CitibikeByRideEventTypeClassifier(EventTypeClassifier):
 
 class CitibikeDataFormatter(DataFormatter):
     def __init__(self, event_type_classifier: EventTypeClassifier = CitibikeByRideEventTypeClassifier()):
-        super().__init__(event_type_classifier) # TODO: How and what???
+        super().__init__(event_type_classifier)
         self.decoder = Decoder(type=Ride, dec_hook=parse_datetime_hook)
 
     def parse_event(self, raw_data: str):
         return asdict(self.decoder.decode(raw_data))
+
+    def get_event_timestamp(self, event_payload: dict):
+        return event_payload['started_at']
 
 class Cepper:
 
@@ -62,9 +65,10 @@ class Cepper:
         self.channel = None
         
         # CEP
+        logger.info(f'Initializing CEP')
         self.cep = cep
         self.input_stream = Stream()
-        self.output_stream = FileOutputStream('/opt/app', 'patterns.out')
+        self.output_stream = FileOutputStream('/opt/app', 'patterns.txt')
         self.data_formatter = CitibikeDataFormatter()
 
         self.max_retries = 5
@@ -91,10 +95,18 @@ class Cepper:
 
 
     def consume_messages(self):
+        import threading
+        threading.Thread(target=self.start_cep_engine, daemon=True).start()
+
         self.channel.basic_qos(prefetch_count=5000)
         self.channel.basic_consume(queue=self.queue_name, on_message_callback=self.process_messages, auto_ack=False)
         logger.info(f"Pattern node: Waiting for messages.")
         self.channel.start_consuming()
+
+    def start_cep_engine(self):
+        logger.info("Starting CEP engine...")
+        self.cep.run(self.input_stream, self.output_stream, self.data_formatter)
+
 
     def close_connections(self):
         if self.queue_connection:
@@ -102,15 +114,9 @@ class Cepper:
             self.queue_connection.close()
 
     def process_messages(self, ch, method, properties, body):
-        logger.info(f"Pattern node: [x] Received {body.decode('utf-8')}")
         data = body.decode('utf-8').strip()
         self.input_stream.add_item(data)
-
         ch.basic_ack(delivery_tag=method.delivery_tag)
-        # self.close_connections() # TODO: remove at the end
-
-    def start_cep(self):
-        self.cep.run(self.input_stream, self.output_stream, self.data_formatter)
 
 def main():
     try:
@@ -133,7 +139,7 @@ def main():
                 # b-end in (7,8,9)
                 SimpleCondition(
                     Variable("b", lambda x: x.end_station_id),
-                    relation_op = lambda end_station: int(end_station.split('.')[1]) in (7, 8, 9)
+                    relation_op = lambda end_station: end_station in (7, 8, 9)
                 ),
                 # a[last].bike = b.bike
                 # KCIndexCondition(
@@ -153,7 +159,6 @@ def main():
             timedelta(hours=1)
         )
         cep = CEP([pattern])
-        logger.info(f'Testing: {cep}')
         conn_params = pika.ConnectionParameters(BROKER_HOST, 5672, '/', pika.PlainCredentials(BROKER_USER, BROKER_PASS))
         pattern_detector = Cepper(QUEUE_NAME, conn_params, cep)
         pattern_detector.connect()

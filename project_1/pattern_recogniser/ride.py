@@ -16,5 +16,5 @@ def parse_datetime_hook(type_, obj):
         try:
             return datetime.strptime(obj, "%Y-%m-%d %H:%M:%S.%f")
         except ValueError:
-            return datetime.strptime(obj, "%Y-%m-%d %H:%M:%S")
+            return value
     return value
