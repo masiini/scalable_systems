@@ -83,16 +83,16 @@ def ingestion():
         for chunk in read_large_file(DATAFILE, 1000):
             for _, row in chunk.iterrows():
                 event = Ride(
-                    row.ride_id, 
-                    row.rideable_type, 
-                    row.started_at, 
-                    row.ended_at, 
-                    row.start_station_id, 
-                    row.end_station_id
+                    str(row.ride_id), 
+                    str(row.rideable_type), 
+                    str(row.started_at), 
+                    str(row.ended_at), 
+                    str(row.start_station_id), 
+                    str(row.end_station_id)
                 )
 
                 # logger.info(f'EVENT: {event.to_json()}')
-                ingestor.publish_message(event.to_json())
+                ingestor.publish_message(event.to_msg())
             # break
         ingestor.close_connections()
     except Exception as e:
