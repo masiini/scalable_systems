@@ -31,6 +31,8 @@ class KCCondition(AtomicCondition, ABC):
         """
         Validates that the given index is within the bounds of the given list.
         """
+        if index < 0:  
+            index += len(lst)
         return 0 <= index < len(lst)
 
     def get_event_names(self):
@@ -61,7 +63,7 @@ class KCIndexCondition(KCCondition):
         the condition returns False.
     """
     def __init__(self, names: set, getattr_func: callable, relation_op: callable,
-                 first_index=None, second_index=None, offset=None):
+                 first_index=None, second_index=None, offset=None, evaluate_all=False):
         """
         Enforce getting 1 of 2 activations types ONLY:
             1) first_index and second_index to compare
@@ -74,6 +76,7 @@ class KCIndexCondition(KCCondition):
         self.__first_index = first_index
         self.__second_index = second_index
         self.__offset = offset
+        self._evaluate_all = evaluate_all
 
     def _eval(self, event_list: list = None):
         # offset is active - choose evaluation by offset mechanism
@@ -86,10 +89,26 @@ class KCIndexCondition(KCCondition):
         """
         Handles the evaluation of an index-based condition.
         """
+        first_index = self.__first_index
+        second_index = self.__second_index
+        if first_index is not None and first_index < 0:
+            first_index += len(event_list)
+        if second_index is not None and second_index < 0:
+            second_index += len(event_list)
         # validate both indexes
-        if not self._validate_index(self.__first_index, event_list) or \
-                not self._validate_index(self.__second_index, event_list):
+        if not self._validate_index(self.__first_index, event_list):
             return False
+
+        if self.__evaluate_all:
+            for b_event in event_list:
+                if self._relation_op(self._getattr_func(event_list[first_index]), self._getattr_func(b_event)):
+                    return True
+            return False
+        
+        # Validate the second index
+        if not self._validate_index(second_index, event_list):
+            return False
+
         # get the items
         item_1 = event_list[self.__first_index]
         item_2 = event_list[self.__second_index]

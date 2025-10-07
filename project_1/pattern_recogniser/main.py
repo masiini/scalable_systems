@@ -136,18 +136,19 @@ def main():
                     relation_op = lambda bike_a, bike_a1: bike_a == bike_a1,
                     offset = 1
                 ),
-                # b-end in (7,8,9)
-                SimpleCondition(
-                    Variable("b", lambda x: x.end_station_id),
-                    relation_op = lambda end_station: end_station in (7, 8, 9)
-                ),
-                # a[last].bike = b.bike
-                # KCIndexCondition(
-                #     names = {"a", "b"},
-                #     getattr_func = lambda x: x.rideable_type,
-                #     relation_op = lambda bike_a, bike_b: bike_a == bike_b,
-                #     index = -1
+                # b-end in (7,8,9) THERE ARE NO SUCH STATIONS IN THE DATASET!!!
+                # SimpleCondition(
+                #     Variable("b", lambda x: x.end_station_id),
+                #     relation_op = lambda end_station: end_station in (7, 8, 9)
                 # ),
+                # a[last].bike = b.bike
+                KCIndexCondition(
+                    names = {"a", "b"},
+                    getattr_func = lambda x: x.rideable_type,
+                    relation_op = lambda bike_a, bike_b: bike_a == bike_b,
+                    first_index = -1,
+                    evaluate_all = True
+                ),
                 # a[i+1].start = a[i].end
                 KCIndexCondition(
                     names = {"a"},
