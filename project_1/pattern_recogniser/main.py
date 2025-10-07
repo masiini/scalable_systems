@@ -5,12 +5,12 @@ from datetime import timedelta
 
 from ride import Ride
 from CEP import CEP
-from condition.Condition import Variable, TrueCondition, BinaryCondition, SimpleCondition
-from condition.CompositeCondition import AndCondition
-from condition.BaseRelationCondition import EqCondition, GreaterThanCondition, GreaterThanEqCondition, \
-    SmallerThanEqCondition
-from base.PatternStructure import AndOperator, SeqOperator, PrimitiveEventStructure
+from condition.Condition import Variable, SimpleCondition
+from condition.KCCondition import KCIndexCondition, KCValueCondition
+from base.PatternStructure import AndOperator, SeqOperator, PrimitiveEventStructure, KleeneClosureOperator
 from base.Pattern import Pattern
+from stream.FileStream import FileOutputStream
+from stream.Stream import Stream, InputStream 
 
 
 logging.basicConfig(
@@ -86,16 +86,47 @@ class Cepper:
 def main():
     try:
         pattern = Pattern(
-            SeqOperator(PrimitiveEventStructure("GOOG", "a"), 
-                        PrimitiveEventStructure("GOOG", "b"), 
-                        PrimitiveEventStructure("GOOG", "c")),
-            SimpleCondition(Variable("a", lambda x: x["Peak Price"]), 
-                            Variable("b", lambda x: x["Peak Price"]),
-                            Variable("c", lambda x: x["Peak Price"]),
-                            relation_op=lambda x,y,z: x < y < z),
-            timedelta(minutes=3)
+            SeqOperator(
+                KleeneClosureOperator(
+                    PrimitiveEventStructure("BikeTrip", "a"), 
+                    min_size=1
+                ),
+                PrimitiveEventStructure("BikeTrip", "b")
+            ),
+            AndOperator(
+                # a[i+1].bike == a[i].bike
+                KCIndexCondition(
+                    names = {"a"},
+                    getattr_func = lambda x: x.rideable_type,
+                    relation_op = lambda bike_a, bike_a1: bike_a == bike_a1,
+                    offset = 1
+                ),
+                # b-end in (7,8,9)
+                SimpleCondition(
+                    Variable("b", lambda x: x.end_station_id),
+                    relation_op = lambda end_station: end_station in (7, 8, 9)
+                ),
+                # a[last].bike = b.bike
+                KCIndexCondition(
+                    names = {"a", "b"},
+                    getattr_func = lambda x: x.rideable_type,
+                    relation_op = lambda bike_a, bike_b: bike_a == bike_b,
+                    index = -1
+                ),
+                # a[i+1].start = a[i].end
+                KCIndexCondition(
+                    names = {"a"},
+                    getattr_func = lambda x: (x.start_station_id, x.end_station_id),
+                    relation_op = lambda bike_a, bike_a1: bike_a1[0] == bike_a[1],
+                    offset = 1
+                )
+            ),
+            timedelta(hours=1)
         )
         cep = CEP([pattern])
+        outputstream = FileOutputStream('/opt/app/', 'stream.out')
+        inputstream = InputStream()
+        # cep.run()
         logger.info(f'Testing: {cep}')
         conn_params = pika.ConnectionParameters(BROKER_HOST, 5672, '/', pika.PlainCredentials(BROKER_USER, BROKER_PASS))
         pattern_detector = Cepper(QUEUE_NAME, conn_params)
