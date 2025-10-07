@@ -14,6 +14,7 @@ class Ride:
     def to_dict(self):
         return {
             "ride_id": self.ride_id,
+            "rideable_type": self.rideable_type,
             "started_at": self.started_at,
             "ended_at": self.ended_at,
             "start_station_id": self.start_station_id,
