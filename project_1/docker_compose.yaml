@@ -8,7 +8,7 @@ services:
       BROKER_PORT: 5672
       BROKER_USER: user
       BROKER_PASS: pass
-      QUEUE_NAME: pattern_output_queue
+      QUEUE_NAME: ingestion_queue
       EXCHANGE_NAME: citibike_exchange
       ROUTE_KEY: output
     working_dir: /opt/app

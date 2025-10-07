@@ -1,16 +1,23 @@
 import pika
-import logging, os, sys
+import logging, os, sys, time
 
-from datetime import timedelta
+from datetime import datetime, timedelta
 
-from ride import Ride
+from msgspec.json import Decoder
+from msgspec import Struct
+from msgspec.structs import asdict
+
+from ride import Ride, parse_datetime_hook
+
 from CEP import CEP
 from condition.Condition import Variable, SimpleCondition
+from condition.CompositeCondition import AndCondition
 from condition.KCCondition import KCIndexCondition, KCValueCondition
 from base.PatternStructure import AndOperator, SeqOperator, PrimitiveEventStructure, KleeneClosureOperator
 from base.Pattern import Pattern
+from base.DataFormatter import EventTypeClassifier, DataFormatter
 from stream.FileStream import FileOutputStream
-from stream.Stream import Stream, InputStream 
+from stream.Stream import Stream
 
 
 logging.basicConfig(
@@ -32,9 +39,21 @@ BROKER_HOST = os.getenv('BROKER_HOST')
 BROKER_USER = os.getenv('BROKER_USER')
 BROKER_PASS = os.getenv('BROKER_PASS')
 
+class CitibikeByRideEventTypeClassifier(EventTypeClassifier):
+    def get_event_type(self, event_payload: dict):
+        return event_payload['ride_id']
+
+class CitibikeDataFormatter(DataFormatter):
+    def __init__(self, event_type_classifier: EventTypeClassifier = CitibikeByRideEventTypeClassifier()):
+        super().__init__(event_type_classifier) # TODO: How and what???
+        self.decoder = Decoder(type=Ride, dec_hook=parse_datetime_hook)
+
+    def parse_event(self, raw_data: str):
+        return asdict(self.decoder.decode(raw_data))
+
 class Cepper:
 
-    def __init__(self, queue_name, conn_params):
+    def __init__(self, queue_name, conn_params, cep):
         self.queue_name = queue_name
         self.rabbitmq_conn_params = conn_params
 
@@ -42,6 +61,12 @@ class Cepper:
         self.queue_connection = None
         self.channel = None
         
+        # CEP
+        self.cep = cep
+        self.input_stream = Stream()
+        self.output_stream = FileOutputStream('/opt/app', 'patterns.out')
+        self.data_formatter = CitibikeDataFormatter()
+
         self.max_retries = 5
         self.retry_delay = 5
 
@@ -66,7 +91,7 @@ class Cepper:
 
 
     def consume_messages(self):
-        self.channel.basic_qos(prefetch_count=1000)
+        self.channel.basic_qos(prefetch_count=5000)
         self.channel.basic_consume(queue=self.queue_name, on_message_callback=self.process_messages, auto_ack=False)
         logger.info(f"Pattern node: Waiting for messages.")
         self.channel.start_consuming()
@@ -78,10 +103,14 @@ class Cepper:
 
     def process_messages(self, ch, method, properties, body):
         logger.info(f"Pattern node: [x] Received {body.decode('utf-8')}")
-        data = body.decode('utf-8').strip().split(",")
+        data = body.decode('utf-8').strip()
+        self.input_stream.add_item(data)
 
         ch.basic_ack(delivery_tag=method.delivery_tag)
+        # self.close_connections() # TODO: remove at the end
 
+    def start_cep(self):
+        self.cep.run(self.input_stream, self.output_stream, self.data_formatter)
 
 def main():
     try:
@@ -93,7 +122,7 @@ def main():
                 ),
                 PrimitiveEventStructure("BikeTrip", "b")
             ),
-            AndOperator(
+            AndCondition(
                 # a[i+1].bike == a[i].bike
                 KCIndexCondition(
                     names = {"a"},
@@ -104,15 +133,15 @@ def main():
                 # b-end in (7,8,9)
                 SimpleCondition(
                     Variable("b", lambda x: x.end_station_id),
-                    relation_op = lambda end_station: end_station in (7, 8, 9)
+                    relation_op = lambda end_station: int(end_station.split('.')[1]) in (7, 8, 9)
                 ),
                 # a[last].bike = b.bike
-                KCIndexCondition(
-                    names = {"a", "b"},
-                    getattr_func = lambda x: x.rideable_type,
-                    relation_op = lambda bike_a, bike_b: bike_a == bike_b,
-                    index = -1
-                ),
+                # KCIndexCondition(
+                #     names = {"a", "b"},
+                #     getattr_func = lambda x: x.rideable_type,
+                #     relation_op = lambda bike_a, bike_b: bike_a == bike_b,
+                #     index = -1
+                # ),
                 # a[i+1].start = a[i].end
                 KCIndexCondition(
                     names = {"a"},
@@ -124,19 +153,15 @@ def main():
             timedelta(hours=1)
         )
         cep = CEP([pattern])
-        outputstream = FileOutputStream('/opt/app/', 'stream.out')
-        inputstream = InputStream()
-        # cep.run()
         logger.info(f'Testing: {cep}')
         conn_params = pika.ConnectionParameters(BROKER_HOST, 5672, '/', pika.PlainCredentials(BROKER_USER, BROKER_PASS))
-        pattern_detector = Cepper(QUEUE_NAME, conn_params)
+        pattern_detector = Cepper(QUEUE_NAME, conn_params, cep)
         pattern_detector.connect()
-        # pattern_detector.consume_messages()
+        pattern_detector.consume_messages()
 
-        pattern_detector.close_connections()
 
     except Exception as e:
-        logger.error(e)    
+        logger.error(e, exc_info=True)
 
 
 if __name__ == '__main__':

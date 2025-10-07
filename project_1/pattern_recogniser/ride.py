@@ -10,3 +10,11 @@ class Ride(Struct):
     ended_at: datetime
     start_station_id: str
     end_station_id: str
+
+def parse_datetime_hook(type_, obj):
+    if type_ is datetime and isinstance(obj, str):
+        try:
+            return datetime.strptime(obj, "%Y-%m-%d %H:%M:%S.%f")
+        except ValueError:
+            return datetime.strptime(obj, "%Y-%m-%d %H:%M:%S")
+    return value
