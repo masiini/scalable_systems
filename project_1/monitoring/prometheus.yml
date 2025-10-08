@@ -1,0 +1,4 @@
+scrape_configs:
+  - job_name: 'opencep'
+    static_configs:
+      - targets: ['opencep:8080']

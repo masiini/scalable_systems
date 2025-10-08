@@ -19,6 +19,7 @@ from base.DataFormatter import EventTypeClassifier, DataFormatter
 from stream.FileStream import FileOutputStream
 from stream.Stream import Stream
 
+from prometheus_client import start_http_server, Counter, Histogram
 
 logging.basicConfig(
     filename='cep.log',
@@ -38,6 +39,9 @@ ROUTE_KEY = os.getenv('ROUTE_KEY')
 BROKER_HOST = os.getenv('BROKER_HOST')
 BROKER_USER = os.getenv('BROKER_USER')
 BROKER_PASS = os.getenv('BROKER_PASS')
+
+latency_h = Histogram('pattern_recognition_latency', 'Latency for pattern recognition')
+messages_processed = Counter('pattern_recognition_messages_processed', 'Total number of messages processed for pattern recognition')
 
 class CitibikeByRideEventTypeClassifier(EventTypeClassifier):
     def get_event_type(self, event_payload: dict):
@@ -68,7 +72,7 @@ class Cepper:
         logger.info(f'Initializing CEP')
         self.cep = cep
         self.input_stream = Stream()
-        self.output_stream = FileOutputStream('/opt/app', 'patterns.txt')
+        self.output_stream = FileOutputStream('/opt/app', 'patterns.txt', True)
         self.data_formatter = CitibikeDataFormatter()
 
         self.max_retries = 5
@@ -113,13 +117,17 @@ class Cepper:
             self.channel.stop_consuming()
             self.queue_connection.close()
 
+    @latency_h.time()
     def process_messages(self, ch, method, properties, body):
         data = body.decode('utf-8').strip()
         self.input_stream.add_item(data)
+        messages_processed.inc()
         ch.basic_ack(delivery_tag=method.delivery_tag)
 
 def main():
     try:
+        start_http_server(8080, addr="0.0.0.0")
+
         pattern = Pattern(
             SeqOperator(
                 KleeneClosureOperator(
