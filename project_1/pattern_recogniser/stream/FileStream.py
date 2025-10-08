@@ -2,7 +2,6 @@ import os
 
 from stream.Stream import InputStream, OutputStream
 
-
 class FileInputStream(InputStream):
     """
     Reads the objects from a predefined input file.
@@ -36,6 +35,8 @@ class FileOutputStream(OutputStream):
         Depending on the settings, either writes the item to the file immediately or buffers it for future write.
         """
         if self.__is_async:
+            from shedding import matches_total
+            matches_total.inc()
             self.__output_file.write(str(item))
         else:
             super().add_item(item)

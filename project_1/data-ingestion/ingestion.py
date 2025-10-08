@@ -49,6 +49,13 @@ class DataIngest:
                 try:
                     self.queue_connection = pika.BlockingConnection(self.rabbitmq_conn_params)
                     self.channel = self.queue_connection.channel()
+                    self.channel.queue_declare(queue=self.queue_name, durable=True)
+                    self.channel.exchange_declare(exchange=EXCHANGE_NAME, exchange_type='direct', durable=True)
+                    self.channel.queue_bind(
+                        exchange=EXCHANGE_NAME,
+                        queue=self.queue_name,
+                        routing_key=ROUTE_KEY
+                    )
                     logger.info(f"Ingestion service: Connected to RabbitMQ")
                     break
                 except pika.exceptions.AMQPConnectionError as e:
@@ -87,8 +94,8 @@ def ingestion():
                     event = Ride(
                         str(row.ride_id), 
                         str(row.rideable_type), 
-                        str(row.started_at), 
-                        str(row.ended_at), 
+                        row.started_at, 
+                        row.ended_at, 
                         str(row.start_station_id), 
                         str(row.end_station_id)
                     )
@@ -96,6 +103,7 @@ def ingestion():
                     ingestor.publish_message(event.to_msg())
                     time.sleep(1 / EVENTS_PER_SECOND)
                 # break
+        logger.info("Ingestion service: Completed sending events.")
         ingestor.close_connections()
     except Exception as e:
         logging.error(e)

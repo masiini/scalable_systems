@@ -1,6 +1,5 @@
-from msgspec.json import decode
+from typing import Optional
 from msgspec import Struct
-
 from datetime import datetime
 
 class Ride(Struct):
@@ -10,11 +9,12 @@ class Ride(Struct):
     ended_at: datetime
     start_station_id: str
     end_station_id: str
+    bike_id: Optional[str] = None
 
 def parse_datetime_hook(type_, obj):
     if type_ is datetime and isinstance(obj, str):
         try:
             return datetime.strptime(obj, "%Y-%m-%d %H:%M:%S.%f")
         except ValueError:
-            return value
-    return value
+            return obj
+    return obj
