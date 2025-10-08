@@ -1,6 +1,6 @@
 import pandas as pd
 import pika
-import logging, os
+import logging, os, time
 from ride import Ride
 
 from datetime import datetime
@@ -12,6 +12,7 @@ BROKER_HOST = os.getenv('BROKER_HOST')
 BROKER_USER = os.getenv('BROKER_USER')
 BROKER_PASS = os.getenv('BROKER_PASS')
 DATAFILE = os.getenv('DATAFILE')
+EVENTS_PER_SECOND = int(os.getenv('EVENTS_PER_SECOND', '10'))
 
 logging.basicConfig(
     filename='ingestion.log',
@@ -80,20 +81,21 @@ def ingestion():
         ingestor = DataIngest(QUEUE_NAME, conn_params)
         ingestor.connect()
 
-        for chunk in read_large_file(DATAFILE, 1000):
-            for _, row in chunk.iterrows():
-                event = Ride(
-                    str(row.ride_id), 
-                    str(row.rideable_type), 
-                    str(row.started_at), 
-                    str(row.ended_at), 
-                    str(row.start_station_id), 
-                    str(row.end_station_id)
-                )
+        if ingestor.is_connected():
+            for chunk in read_large_file(DATAFILE, EVENTS_PER_SECOND):
+                for _, row in chunk.iterrows():
+                    event = Ride(
+                        str(row.ride_id), 
+                        str(row.rideable_type), 
+                        str(row.started_at), 
+                        str(row.ended_at), 
+                        str(row.start_station_id), 
+                        str(row.end_station_id)
+                    )
 
-                # logger.info(f'EVENT: {event.to_json()}')
-                ingestor.publish_message(event.to_msg())
-            # break
+                    ingestor.publish_message(event.to_msg())
+                    time.sleep(1 / EVENTS_PER_SECOND)
+                # break
         ingestor.close_connections()
     except Exception as e:
         logging.error(e)

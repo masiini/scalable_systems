@@ -34,6 +34,7 @@ services:
       EXCHANGE_NAME: citibike_exchange
       ROUTE_KEY: input
       DATAFILE: /datasets/202508-citibike-tripdata_1.csv
+      EVENTS_PER_SECOND: 10
     command: ["/bin/sh", "-c", "pip install -r requirements.txt && python ingestion.py"]
     working_dir: /opt/app
     volumes:
