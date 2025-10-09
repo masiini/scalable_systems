@@ -50,7 +50,9 @@ BROKER_HOST = os.getenv('BROKER_HOST')
 BROKER_USER = os.getenv('BROKER_USER')
 BROKER_PASS = os.getenv('BROKER_PASS')
 
-PREFETCH = 5000
+PREFETCH = 100
+KLEENE_MIN = 2
+KLEENE_MAX = 5
 
 latency_h = Histogram('pattern_recognition_latency', 'Latency for pattern recognition')
 messages_processed = Counter('pattern_recognition_messages_processed', 'Total number of messages processed for pattern recognition')
@@ -176,12 +178,18 @@ def full_pattern(event_type: str, stations: set[str]):
         AND a[i+1].start = a[i].end
     WITHIN 1h
     """
+    consumption_policy = ConsumptionPolicy(
+        primary_selection_strategy=SelectionStrategies.MATCH_ANY,
+        secondary_selection_strategy=SelectionStrategies.MATCH_SINGLE,
+        single=["classic_bike", "electric_bike"]
+    )
+
     return Pattern(
         SeqOperator(
             KleeneClosureOperator(
                 PrimitiveEventStructure(event_type,"a"), 
-                min_size=2, 
-                # max_size=10
+                min_size=KLEENE_MIN, 
+                max_size=KLEENE_MAX
             ),
             PrimitiveEventStructure(event_type,"b")
         ),
@@ -209,10 +217,11 @@ def full_pattern(event_type: str, stations: set[str]):
                 relation_op=lambda eid, S=stations: eid in S
             ),
         ),
-        timedelta(hours=1)
+        timedelta(hours=1),
+        consumption_policy=consumption_policy
     )
 
-# for testing (end station pattern)
+# for testing
 def test(event_type: str, stations: set[str]):
     return Pattern(
         SeqOperator(PrimitiveEventStructure(event_type, "b")),

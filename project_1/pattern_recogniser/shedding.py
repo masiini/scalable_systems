@@ -13,16 +13,16 @@ queue_depth_g = Gauge('rabbitmq_queue_depth', 'Queue depth (messages)')
 TARGET = {"6822.09","5779.09", "5905.12"}
 
 # queue thresholds
-HIGH = 50000
-LOW  = 20000
+HIGH = 10000
+LOW  = 3000
 
 # latency thresholds (seconds)
-P95_L1 = 0.03   # 30 ms → go to level 1
-P95_L2 = 0.06   # 60 ms → go to level 2
+P95_L1 = 0.1   # 100 ms → go to level 1
+P95_L2 = 0.3   # 200 ms → go to level 2
 
-TAU1 = 0.5
-TAU2 = 2.0
-SAMPLE_MED = 0.5
+TAU1 = 0.7
+TAU2 = 2.5
+SAMPLE_MED = 0.3
 
 class LatencyWindow:
     def __init__(self, max_samples=5000, window_sec=30):
