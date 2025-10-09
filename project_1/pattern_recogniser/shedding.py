@@ -4,7 +4,10 @@ from collections import defaultdict, deque
 from prometheus_client import Gauge, Counter, Histogram
 import pika
 
+p95_latency_g = Gauge('controller_p95_latency_seconds', 'Rolling p95 used by shedding controller')
+target_latency_g = Gauge('controller_target_p95_seconds', 'Target p95 (baseline * pct)')
 shed_level_g  = Gauge('shed_level', 'Shedding level (0=off,1,2)')
+shed_cause_g  = Gauge('shed_cause', '0=none,1=latency,2=depth,3=both')
 events_fwd    = Counter('events_forwarded_total', 'Events forwarded to CEP')
 events_drop   = Counter('events_dropped_total', 'Events dropped by shedding', ['reason'])
 matches_total = Counter('matches_total', 'Pattern matches emitted')
@@ -16,9 +19,9 @@ TARGET = {"6822.09","5779.09", "5905.12"}
 HIGH = 10000
 LOW  = 3000
 
-# latency thresholds (seconds)
-P95_L1 = 0.1   # 100 ms → go to level 1
-P95_L2 = 0.3   # 200 ms → go to level 2
+# # latency thresholds (seconds)
+# P95_L1 = 0.1   # 100 ms → go to level 1
+# P95_L2 = 0.3   # 200 ms → go to level 2
 
 TAU1 = 0.7
 TAU2 = 2.5
@@ -55,13 +58,15 @@ latency_window = LatencyWindow()
 
 class SheddingState:
     def __init__(self, conn_params: pika.ConnectionParameters, queue_name: str,
-                 high:int=HIGH, low:int=LOW, poll_period:float=0.5):
+                 high:int=HIGH, low:int=LOW, poll_period:float=0.5,
+                 target_p95: float = 2.0):
         self.q = queue_name
         self.high, self.low = high, low
         self.level = 0
         self._depth = 0
         self._poll_period = poll_period
         self._stop = False
+        self.target_p95 = target_p95
         self._conn_params = conn_params
         t = threading.Thread(target=self._poller, daemon=True)
         t.start()
@@ -90,18 +95,36 @@ class SheddingState:
     def update(self) -> int:
         depth = self._depth
         p95   = latency_window.p95()
-
-        # Depth-based level
         depth_level = 2 if depth >= self.high else (1 if depth >= self.low else 0)
 
         # Latency-based level
         lat_level = 0
         if p95 is not None:
-            lat_level = 2 if p95 >= P95_L2 else (1 if p95 >= P95_L1 else 0)
+            p95_latency_g.set(p95)
+            if self.target_p95 is not None:
+                target_latency_g.set(self.target_p95)
+                # hysteresis band to avoid flapping
+                hi = 1.05 * self.target_p95
+                lo = 0.70 * self.target_p95
+                if   p95 >= hi:          lat_level = 2
+                elif p95 >= self.target_p95: lat_level = 1
+                elif p95 <= lo:          lat_level = 0
+                else:                    lat_level = 1
+            else:
+                # fixed steps if no target provided
+                P95_L1 = 0.10  # 100ms
+                P95_L2 = 0.30  # 300ms
+                lat_level = 2 if p95 >= P95_L2 else (1 if p95 >= P95_L1 else 0)
 
-        # Choose the stricter one
+        # Choose stricter
+        if   depth_level and lat_level: cause = 3
+        elif depth_level:               cause = 2
+        elif lat_level:                 cause = 1
+        else:                           cause = 0
+
         self.level = max(depth_level, lat_level)
         shed_level_g.set(self.level)
+        shed_cause_g.set(cause)
         return self.level
 
 class RecentEnds:
@@ -149,9 +172,7 @@ class TypeChainTracker:
                 best = (i, last_end, length, first_start)
 
         if best is None:
-            prev_len = 0
-            first_start = t_start
-            length = 1
+            prev_len, first_start, length = 0, t_start, 1
         else:
             _, last_end, length0, first_start = best
             prev_len = length0

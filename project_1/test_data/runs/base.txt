@@ -1,0 +1,93 @@
+# HELP python_gc_objects_collected_total Objects collected during gc
+# TYPE python_gc_objects_collected_total counter
+python_gc_objects_collected_total{generation="0"} 1545.0
+python_gc_objects_collected_total{generation="1"} 359.0
+python_gc_objects_collected_total{generation="2"} 32.0
+# HELP python_gc_objects_uncollectable_total Uncollectable objects found during GC
+# TYPE python_gc_objects_uncollectable_total counter
+python_gc_objects_uncollectable_total{generation="0"} 0.0
+python_gc_objects_uncollectable_total{generation="1"} 0.0
+python_gc_objects_uncollectable_total{generation="2"} 0.0
+# HELP python_gc_collections_total Number of times this generation was collected
+# TYPE python_gc_collections_total counter
+python_gc_collections_total{generation="0"} 6434.0
+python_gc_collections_total{generation="1"} 584.0
+python_gc_collections_total{generation="2"} 53.0
+# HELP python_info Python platform information
+# TYPE python_info gauge
+python_info{implementation="CPython",major="3",minor="9",patchlevel="23",version="3.9.23"} 1.0
+# HELP process_virtual_memory_bytes Virtual memory size in bytes.
+# TYPE process_virtual_memory_bytes gauge
+process_virtual_memory_bytes 6.7670016e+07
+# HELP process_resident_memory_bytes Resident memory size in bytes.
+# TYPE process_resident_memory_bytes gauge
+process_resident_memory_bytes 5.6467456e+07
+# HELP process_start_time_seconds Start time of the process since unix epoch in seconds.
+# TYPE process_start_time_seconds gauge
+process_start_time_seconds 1.76004821028e+09
+# HELP process_cpu_seconds_total Total user and system CPU time spent in seconds.
+# TYPE process_cpu_seconds_total counter
+process_cpu_seconds_total 51.39
+# HELP process_open_fds Number of open file descriptors.
+# TYPE process_open_fds gauge
+process_open_fds 17.0
+# HELP process_max_fds Maximum number of open file descriptors.
+# TYPE process_max_fds gauge
+process_max_fds 1.048576e+06
+# HELP controller_p95_latency_seconds Rolling p95 used by shedding controller
+# TYPE controller_p95_latency_seconds gauge
+controller_p95_latency_seconds 0.01235258299857378
+# HELP controller_target_p95_seconds Target p95 (baseline * pct)
+# TYPE controller_target_p95_seconds gauge
+controller_target_p95_seconds 2.0
+# HELP shed_level Shedding level (0=off,1,2)
+# TYPE shed_level gauge
+shed_level 0.0
+# HELP shed_cause 0=none,1=latency,2=depth,3=both
+# TYPE shed_cause gauge
+shed_cause 0.0
+# HELP events_forwarded_total Events forwarded to CEP
+# TYPE events_forwarded_total counter
+events_forwarded_total 4724.0
+# HELP events_forwarded_created Events forwarded to CEP
+# TYPE events_forwarded_created gauge
+events_forwarded_created 1.760048218044391e+09
+# HELP events_dropped_total Events dropped by shedding
+# TYPE events_dropped_total counter
+# HELP matches_total Pattern matches emitted
+# TYPE matches_total counter
+matches_total 15.0
+# HELP matches_created Pattern matches emitted
+# TYPE matches_created gauge
+matches_created 1.760048218044432e+09
+# HELP rabbitmq_queue_depth Queue depth (messages)
+# TYPE rabbitmq_queue_depth gauge
+rabbitmq_queue_depth 0.0
+# HELP pattern_recognition_latency Latency for pattern recognition
+# TYPE pattern_recognition_latency histogram
+pattern_recognition_latency_bucket{le="0.005"} 185.0
+pattern_recognition_latency_bucket{le="0.01"} 4078.0
+pattern_recognition_latency_bucket{le="0.025"} 4697.0
+pattern_recognition_latency_bucket{le="0.05"} 4723.0
+pattern_recognition_latency_bucket{le="0.075"} 4723.0
+pattern_recognition_latency_bucket{le="0.1"} 4723.0
+pattern_recognition_latency_bucket{le="0.25"} 4723.0
+pattern_recognition_latency_bucket{le="0.5"} 4723.0
+pattern_recognition_latency_bucket{le="0.75"} 4723.0
+pattern_recognition_latency_bucket{le="1.0"} 4723.0
+pattern_recognition_latency_bucket{le="2.5"} 4723.0
+pattern_recognition_latency_bucket{le="5.0"} 4723.0
+pattern_recognition_latency_bucket{le="7.5"} 4723.0
+pattern_recognition_latency_bucket{le="10.0"} 4723.0
+pattern_recognition_latency_bucket{le="+Inf"} 4723.0
+pattern_recognition_latency_count 4723.0
+pattern_recognition_latency_sum 34.180739040195476
+# HELP pattern_recognition_latency_created Latency for pattern recognition
+# TYPE pattern_recognition_latency_created gauge
+pattern_recognition_latency_created 1.760048218095388e+09
+# HELP pattern_recognition_messages_processed_total Total number of messages processed for pattern recognition
+# TYPE pattern_recognition_messages_processed_total counter
+pattern_recognition_messages_processed_total 4724.0
+# HELP pattern_recognition_messages_processed_created Total number of messages processed for pattern recognition
+# TYPE pattern_recognition_messages_processed_created gauge
+pattern_recognition_messages_processed_created 1.7600482180954762e+09

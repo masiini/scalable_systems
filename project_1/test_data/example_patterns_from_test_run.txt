@@ -1,0 +1,201 @@
+1: {'ride_id': 'F8MDD4V30T9NT3W5', 'rideable_type': 'classic_bike', 'started_at': 2020-12-01 07:00:05, 'ended_at': 2020-12-01 07:24:54, 'start_station_id': '6004.06', 'end_station_id': '5905.12'}
+{'ride_id': 'EN93IIUC039TEX8F', 'rideable_type': 'classic_bike', 'started_at': 2020-12-01 07:01:00, 'ended_at': 2020-12-01 07:22:26, 'start_station_id': '5905.12', 'end_station_id': '6230.04'}
+{'ride_id': 'F8MDD4V30T9NT3W5', 'rideable_type': 'classic_bike', 'started_at': 2020-12-01 07:00:05, 'ended_at': 2020-12-01 07:24:54, 'start_station_id': '6004.06', 'end_station_id': '5905.12'}
+
+1: {'ride_id': '1MKFAZZ81SDW4SHN', 'rideable_type': 'classic_bike', 'started_at': 2020-12-01 07:00:50, 'ended_at': 2020-12-01 07:25:06, 'start_station_id': '6602.03', 'end_station_id': '6912.01'}
+{'ride_id': 'HL9XPSEIMVIHCWI6', 'rideable_type': 'classic_bike', 'started_at': 2020-12-01 07:01:18, 'ended_at': 2020-12-01 07:20:42, 'start_station_id': '6912.01', 'end_station_id': '6824.07'}
+{'ride_id': 'D4D6AF58C2JWOCLY', 'rideable_type': 'classic_bike', 'started_at': 2020-12-01 07:08:09, 'ended_at': 2020-12-01 07:26:17, 'start_station_id': '6743.06', 'end_station_id': '5905.12'}
+
+2: {'ride_id': 'RMJKV5USGIOTIRZQ', 'rideable_type': 'electric_bike', 'started_at': 2020-12-01 07:05:56, 'ended_at': 2020-12-01 07:07:54, 'start_station_id': '6230.04', 'end_station_id': '5905.12'}
+{'ride_id': 'E153A5QBSWRPBJEK', 'rideable_type': 'electric_bike', 'started_at': 2020-12-01 07:07:11, 'ended_at': 2020-12-01 07:11:11, 'start_station_id': '5905.12', 'end_station_id': '5788.12'}
+{'ride_id': 'P84DYT9MOGE4QXXV', 'rideable_type': 'electric_bike', 'started_at': 2020-12-01 07:10:04, 'ended_at': 2020-12-01 07:12:11, 'start_station_id': '6824.07', 'end_station_id': '5905.12'}
+
+1: {'ride_id': 'KCIDKWNNHJ7XVG0F', 'rideable_type': 'classic_bike', 'started_at': 2020-12-01 07:00:16, 'ended_at': 2020-12-01 07:02:49, 'start_station_id': '6822.09', 'end_station_id': '5779.09'}
+{'ride_id': 'RT05UIRODXMO5BXX', 'rideable_type': 'classic_bike', 'started_at': 2020-12-01 07:01:33, 'ended_at': 2020-12-01 07:20:05, 'start_station_id': '5779.09', 'end_station_id': '5788.12'}
+{'ride_id': 'EUC1HH5LF6A4FEJG', 'rideable_type': 'classic_bike', 'started_at': 2020-12-01 07:10:09, 'ended_at': 2020-12-01 07:38:00, 'start_station_id': '5905.12', 'end_station_id': '5779.09'}
+
+1: {'ride_id': 'F8MDD4V30T9NT3W5', 'rideable_type': 'classic_bike', 'started_at': 2020-12-01 07:00:05, 'ended_at': 2020-12-01 07:24:54, 'start_station_id': '6004.06', 'end_station_id': '5905.12'}
+{'ride_id': 'EN93IIUC039TEX8F', 'rideable_type': 'classic_bike', 'started_at': 2020-12-01 07:01:00, 'ended_at': 2020-12-01 07:22:26, 'start_station_id': '5905.12', 'end_station_id': '6230.04'}
+{'ride_id': '56FAO72KZ02XRGHC', 'rideable_type': 'classic_bike', 'started_at': 2020-12-01 07:01:51, 'ended_at': 2020-12-01 07:16:43, 'start_station_id': '6230.04', 'end_station_id': '6230.04'}
+{'ride_id': 'D4N1U3493WXA73JG', 'rideable_type': 'classic_bike', 'started_at': 2020-12-01 07:11:04, 'ended_at': 2020-12-01 07:34:28, 'start_station_id': '6230.04', 'end_station_id': '5779.09'}
+
+1: {'ride_id': 'HL9XPSEIMVIHCWI6', 'rideable_type': 'classic_bike', 'started_at': 2020-12-01 07:01:18, 'ended_at': 2020-12-01 07:20:42, 'start_station_id': '6912.01', 'end_station_id': '6824.07'}
+{'ride_id': '7253J2D54I3QK2IA', 'rideable_type': 'classic_bike', 'started_at': 2020-12-01 07:03:08, 'ended_at': 2020-12-01 07:10:15, 'start_station_id': '6824.07', 'end_station_id': '5905.12'}
+{'ride_id': 'RPJ1EPKYRYBOVAKH', 'rideable_type': 'classic_bike', 'started_at': 2020-12-01 07:11:24, 'ended_at': 2020-12-01 07:21:41, 'start_station_id': '6230.04', 'end_station_id': '6822.09'}
+
+1: {'ride_id': 'KCIDKWNNHJ7XVG0F', 'rideable_type': 'classic_bike', 'started_at': 2020-12-01 07:00:16, 'ended_at': 2020-12-01 07:02:49, 'start_station_id': '6822.09', 'end_station_id': '5779.09'}
+{'ride_id': 'FHOLQC3O18A5UR7K', 'rideable_type': 'classic_bike', 'started_at': 2020-12-01 07:04:44, 'ended_at': 2020-12-01 07:10:52, 'start_station_id': '5779.09', 'end_station_id': '6004.06'}
+{'ride_id': '8XFDJGF1C8WQUUY5', 'rideable_type': 'classic_bike', 'started_at': 2020-12-01 07:11:59, 'ended_at': 2020-12-01 07:39:28, 'start_station_id': '5905.12', 'end_station_id': '5905.12'}
+
+2: {'ride_id': '6246HID25OWF7593', 'rideable_type': 'electric_bike', 'started_at': 2020-12-01 07:02:50, 'ended_at': 2020-12-01 07:08:11, 'start_station_id': '5351.03', 'end_station_id': '5788.12'}
+{'ride_id': '1MSY4LA5JU9BVM2P', 'rideable_type': 'electric_bike', 'started_at': 2020-12-01 07:03:19, 'ended_at': 2020-12-01 07:15:31, 'start_station_id': '5788.12', 'end_station_id': '5492.05'}
+{'ride_id': 'LRFCD6MZSGIPPSFN', 'rideable_type': 'electric_bike', 'started_at': 2020-12-01 07:12:20, 'ended_at': 2020-12-01 07:40:58, 'start_station_id': '6743.06', 'end_station_id': '6822.09'}
+
+2: {'ride_id': 'IOYKL1CQ99CHJ755', 'rideable_type': 'electric_bike', 'started_at': 2020-12-01 07:02:12, 'ended_at': 2020-12-01 07:10:10, 'start_station_id': '6822.09', 'end_station_id': '6824.07'}
+{'ride_id': 'EP7Y6WKTAKPUXQPH', 'rideable_type': 'electric_bike', 'started_at': 2020-12-01 07:03:45, 'ended_at': 2020-12-01 07:18:29, 'start_station_id': '6824.07', 'end_station_id': '5788.12'}
+{'ride_id': 'V2XCDYK0X65MUFM8', 'rideable_type': 'electric_bike', 'started_at': 2020-12-01 07:12:34, 'ended_at': 2020-12-01 07:27:31, 'start_station_id': '6912.01', 'end_station_id': '5905.12'}
+
+2: {'ride_id': 'IOYKL1CQ99CHJ755', 'rideable_type': 'electric_bike', 'started_at': 2020-12-01 07:02:12, 'ended_at': 2020-12-01 07:10:10, 'start_station_id': '6822.09', 'end_station_id': '6824.07'}
+{'ride_id': '3T60RJIW1SWJCKJL', 'rideable_type': 'electric_bike', 'started_at': 2020-12-01 07:04:37, 'ended_at': 2020-12-01 07:26:31, 'start_station_id': '6824.07', 'end_station_id': '6602.03'}
+{'ride_id': 'PK0QTL3Q4N89QKNS', 'rideable_type': 'electric_bike', 'started_at': 2020-12-01 07:13:20, 'ended_at': 2020-12-01 07:37:25, 'start_station_id': '6824.07', 'end_station_id': '5779.09'}
+
+2: {'ride_id': 'IOYKL1CQ99CHJ755', 'rideable_type': 'electric_bike', 'started_at': 2020-12-01 07:02:12, 'ended_at': 2020-12-01 07:10:10, 'start_station_id': '6822.09', 'end_station_id': '6824.07'}
+{'ride_id': 'EP7Y6WKTAKPUXQPH', 'rideable_type': 'electric_bike', 'started_at': 2020-12-01 07:03:45, 'ended_at': 2020-12-01 07:18:29, 'start_station_id': '6824.07', 'end_station_id': '5788.12'}
+{'ride_id': 'I2HGJ11YEDWB2BNE', 'rideable_type': 'electric_bike', 'started_at': 2020-12-01 07:08:56, 'ended_at': 2020-12-01 07:38:21, 'start_station_id': '5788.12', 'end_station_id': '6912.01'}
+{'ride_id': 'JEN0JNWNYQW7LVXW', 'rideable_type': 'electric_bike', 'started_at': 2020-12-01 07:09:27, 'ended_at': 2020-12-01 07:13:31, 'start_station_id': '6912.01', 'end_station_id': '6004.06'}
+{'ride_id': 'UGYSM8T2SA5BNN0M', 'rideable_type': 'electric_bike', 'started_at': 2020-12-01 07:14:07, 'ended_at': 2020-12-01 07:15:10, 'start_station_id': '6743.06', 'end_station_id': '5905.12'}
+
+2: {'ride_id': 'FGSXW71Q3VLI7KQ1', 'rideable_type': 'electric_bike', 'started_at': 2020-12-01 07:05:39, 'ended_at': 2020-12-01 07:19:00, 'start_station_id': '6822.09', 'end_station_id': '6230.04'}
+{'ride_id': 'RMJKV5USGIOTIRZQ', 'rideable_type': 'electric_bike', 'started_at': 2020-12-01 07:05:56, 'ended_at': 2020-12-01 07:07:54, 'start_station_id': '6230.04', 'end_station_id': '5905.12'}
+{'ride_id': 'DU1EMMX3Y9RGEZ7B', 'rideable_type': 'electric_bike', 'started_at': 2020-12-01 07:14:14, 'ended_at': 2020-12-01 07:23:27, 'start_station_id': '6824.07', 'end_station_id': '6822.09'}
+
+1: {'ride_id': 'KCIDKWNNHJ7XVG0F', 'rideable_type': 'classic_bike', 'started_at': 2020-12-01 07:00:16, 'ended_at': 2020-12-01 07:02:49, 'start_station_id': '6822.09', 'end_station_id': '5779.09'}
+{'ride_id': 'FEYUHZ1GV0E38DAL', 'rideable_type': 'classic_bike', 'started_at': 2020-12-01 07:05:14, 'ended_at': 2020-12-01 07:14:40, 'start_station_id': '5779.09', 'end_station_id': '5351.03'}
+{'ride_id': 'TEKTSG7FXZV4U3BB', 'rideable_type': 'classic_bike', 'started_at': 2020-12-01 07:16:07, 'ended_at': 2020-12-01 07:25:40, 'start_station_id': '5779.09', 'end_station_id': '6822.09'}
+
+2: {'ride_id': 'IOYKL1CQ99CHJ755', 'rideable_type': 'electric_bike', 'started_at': 2020-12-01 07:02:12, 'ended_at': 2020-12-01 07:10:10, 'start_station_id': '6822.09', 'end_station_id': '6824.07'}
+{'ride_id': '26RJRNY20479T6VX', 'rideable_type': 'electric_bike', 'started_at': 2020-12-01 07:05:01, 'ended_at': 2020-12-01 07:24:23, 'start_station_id': '6824.07', 'end_station_id': '6824.07'}
+{'ride_id': 'Y9V20YAR821UZVGW', 'rideable_type': 'electric_bike', 'started_at': 2020-12-01 07:17:26, 'ended_at': 2020-12-01 07:46:16, 'start_station_id': '5351.03', 'end_station_id': '5905.12'}
+
+1: {'ride_id': 'KCIDKWNNHJ7XVG0F', 'rideable_type': 'classic_bike', 'started_at': 2020-12-01 07:00:16, 'ended_at': 2020-12-01 07:02:49, 'start_station_id': '6822.09', 'end_station_id': '5779.09'}
+{'ride_id': 'IXNTM9TMQLIZL08Y', 'rideable_type': 'classic_bike', 'started_at': 2020-12-01 07:06:01, 'ended_at': 2020-12-01 07:17:03, 'start_station_id': '5779.09', 'end_station_id': '6004.06'}
+{'ride_id': 'UZGPPOHSWQ40ZSU9', 'rideable_type': 'classic_bike', 'started_at': 2020-12-01 07:17:43, 'ended_at': 2020-12-01 07:46:45, 'start_station_id': '6822.09', 'end_station_id': '5779.09'}
+
+2: {'ride_id': 'FGSXW71Q3VLI7KQ1', 'rideable_type': 'electric_bike', 'started_at': 2020-12-01 07:05:39, 'ended_at': 2020-12-01 07:19:00, 'start_station_id': '6822.09', 'end_station_id': '6230.04'}
+{'ride_id': 'VPUC8D1WJCITFOYQ', 'rideable_type': 'electric_bike', 'started_at': 2020-12-01 07:06:32, 'ended_at': 2020-12-01 07:22:54, 'start_station_id': '6230.04', 'end_station_id': '5788.12'}
+{'ride_id': 'OFN1R4KZ36U8UEIH', 'rideable_type': 'electric_bike', 'started_at': 2020-12-01 07:20:49, 'ended_at': 2020-12-01 07:48:38, 'start_station_id': '6602.03', 'end_station_id': '5905.12'}
+
+1: {'ride_id': 'F8MDD4V30T9NT3W5', 'rideable_type': 'classic_bike', 'started_at': 2020-12-01 07:00:05, 'ended_at': 2020-12-01 07:24:54, 'start_station_id': '6004.06', 'end_station_id': '5905.12'}
+{'ride_id': 'EN93IIUC039TEX8F', 'rideable_type': 'classic_bike', 'started_at': 2020-12-01 07:01:00, 'ended_at': 2020-12-01 07:22:26, 'start_station_id': '5905.12', 'end_station_id': '6230.04'}
+{'ride_id': '56FAO72KZ02XRGHC', 'rideable_type': 'classic_bike', 'started_at': 2020-12-01 07:01:51, 'ended_at': 2020-12-01 07:16:43, 'start_station_id': '6230.04', 'end_station_id': '6230.04'}
+{'ride_id': 'V1V93KMKZEBBK7W1', 'rideable_type': 'classic_bike', 'started_at': 2020-12-01 07:06:12, 'ended_at': 2020-12-01 07:32:24, 'start_station_id': '6230.04', 'end_station_id': '5788.12'}
+{'ride_id': 'FTG698S4C3BAEWCF', 'rideable_type': 'classic_bike', 'started_at': 2020-12-01 07:21:41, 'ended_at': 2020-12-01 07:47:41, 'start_station_id': '6912.01', 'end_station_id': '5905.12'}
+
+1: {'ride_id': 'F8MDD4V30T9NT3W5', 'rideable_type': 'classic_bike', 'started_at': 2020-12-01 07:00:05, 'ended_at': 2020-12-01 07:24:54, 'start_station_id': '6004.06', 'end_station_id': '5905.12'}
+{'ride_id': 'EN93IIUC039TEX8F', 'rideable_type': 'classic_bike', 'started_at': 2020-12-01 07:01:00, 'ended_at': 2020-12-01 07:22:26, 'start_station_id': '5905.12', 'end_station_id': '6230.04'}
+{'ride_id': '56FAO72KZ02XRGHC', 'rideable_type': 'classic_bike', 'started_at': 2020-12-01 07:01:51, 'ended_at': 2020-12-01 07:16:43, 'start_station_id': '6230.04', 'end_station_id': '6230.04'}
+{'ride_id': 'V1V93KMKZEBBK7W1', 'rideable_type': 'classic_bike', 'started_at': 2020-12-01 07:06:12, 'ended_at': 2020-12-01 07:32:24, 'start_station_id': '6230.04', 'end_station_id': '5788.12'}
+{'ride_id': 'PGB7R3OCWBFUK9E1', 'rideable_type': 'classic_bike', 'started_at': 2020-12-01 07:06:20, 'ended_at': 2020-12-01 07:26:55, 'start_station_id': '5788.12', 'end_station_id': '6230.04'}
+{'ride_id': 'F337KUU4YTN02YC0', 'rideable_type': 'classic_bike', 'started_at': 2020-12-01 07:22:26, 'ended_at': 2020-12-01 07:34:10, 'start_station_id': '5351.03', 'end_station_id': '5779.09'}
+
+1: {'ride_id': '1MKFAZZ81SDW4SHN', 'rideable_type': 'classic_bike', 'started_at': 2020-12-01 07:00:50, 'ended_at': 2020-12-01 07:25:06, 'start_station_id': '6602.03', 'end_station_id': '6912.01'}
+{'ride_id': 'HL9XPSEIMVIHCWI6', 'rideable_type': 'classic_bike', 'started_at': 2020-12-01 07:01:18, 'ended_at': 2020-12-01 07:20:42, 'start_station_id': '6912.01', 'end_station_id': '6824.07'}
+{'ride_id': '4CIJ2V2HEIFJFC2V', 'rideable_type': 'classic_bike', 'started_at': 2020-12-01 07:06:38, 'ended_at': 2020-12-01 07:17:28, 'start_station_id': '6824.07', 'end_station_id': '5788.12'}
+{'ride_id': 'CVWV8LW2QITNGVN1', 'rideable_type': 'classic_bike', 'started_at': 2020-12-01 07:22:42, 'ended_at': 2020-12-01 07:27:02, 'start_station_id': '6004.06', 'end_station_id': '5779.09'}
+
+2: {'ride_id': 'FGSXW71Q3VLI7KQ1', 'rideable_type': 'electric_bike', 'started_at': 2020-12-01 07:05:39, 'ended_at': 2020-12-01 07:19:00, 'start_station_id': '6822.09', 'end_station_id': '6230.04'}
+{'ride_id': 'Z7SRCBPLJD84U89Y', 'rideable_type': 'electric_bike', 'started_at': 2020-12-01 07:06:52, 'ended_at': 2020-12-01 07:12:06, 'start_station_id': '6230.04', 'end_station_id': '6824.07'}
+{'ride_id': '7ZRWQEAO4N5PP3XV', 'rideable_type': 'electric_bike', 'started_at': 2020-12-01 07:23:26, 'ended_at': 2020-12-01 07:51:08, 'start_station_id': '5492.05', 'end_station_id': '5905.12'}
+
+2: {'ride_id': 'Y6452H2ZQU7EEQTU', 'rideable_type': 'electric_bike', 'started_at': 2020-12-01 07:04:22, 'ended_at': 2020-12-01 07:19:00, 'start_station_id': '5779.09', 'end_station_id': '5593.04'}
+{'ride_id': '7S55J2O7S3KKV9RF', 'rideable_type': 'electric_bike', 'started_at': 2020-12-01 07:07:43, 'ended_at': 2020-12-01 07:27:31, 'start_station_id': '5593.04', 'end_station_id': '6004.06'}
+{'ride_id': 'L88KZRUIN3OEUVTY', 'rideable_type': 'electric_bike', 'started_at': 2020-12-01 07:23:40, 'ended_at': 2020-12-01 07:45:15, 'start_station_id': '6824.07', 'end_station_id': '5779.09'}
+
+2: {'ride_id': 'IOYKL1CQ99CHJ755', 'rideable_type': 'electric_bike', 'started_at': 2020-12-01 07:02:12, 'ended_at': 2020-12-01 07:10:10, 'start_station_id': '6822.09', 'end_station_id': '6824.07'}
+{'ride_id': '3T60RJIW1SWJCKJL', 'rideable_type': 'electric_bike', 'started_at': 2020-12-01 07:04:37, 'ended_at': 2020-12-01 07:26:31, 'start_station_id': '6824.07', 'end_station_id': '6602.03'}
+{'ride_id': 'N759IN4OLR6N92XF', 'rideable_type': 'electric_bike', 'started_at': 2020-12-01 07:08:03, 'ended_at': 2020-12-01 07:20:23, 'start_station_id': '6602.03', 'end_station_id': '6912.01'}
+{'ride_id': 'YX9TRFLQBMAE38SR', 'rideable_type': 'electric_bike', 'started_at': 2020-12-01 07:25:24, 'ended_at': 2020-12-01 07:32:44, 'start_station_id': '6230.04', 'end_station_id': '6822.09'}
+
+1: {'ride_id': '1MKFAZZ81SDW4SHN', 'rideable_type': 'classic_bike', 'started_at': 2020-12-01 07:00:50, 'ended_at': 2020-12-01 07:25:06, 'start_station_id': '6602.03', 'end_station_id': '6912.01'}
+{'ride_id': 'SPK9P38QOLDFORXO', 'rideable_type': 'classic_bike', 'started_at': 2020-12-01 07:07:05, 'ended_at': 2020-12-01 07:34:07, 'start_station_id': '6912.01', 'end_station_id': '5593.04'}
+{'ride_id': 'BW01PDDHCVSQAME4', 'rideable_type': 'classic_bike', 'started_at': 2020-12-01 07:27:03, 'ended_at': 2020-12-01 07:40:44, 'start_station_id': '6822.09', 'end_station_id': '6822.09'}
+
+1: {'ride_id': 'IFTTD96QE3RZSJ49', 'rideable_type': 'classic_bike', 'started_at': 2020-12-01 07:07:31, 'ended_at': 2020-12-01 07:09:30, 'start_station_id': '6822.09', 'end_station_id': '6743.06'}
+{'ride_id': 'D4D6AF58C2JWOCLY', 'rideable_type': 'classic_bike', 'started_at': 2020-12-01 07:08:09, 'ended_at': 2020-12-01 07:26:17, 'start_station_id': '6743.06', 'end_station_id': '5905.12'}
+{'ride_id': 'S3JN050E6MPSJ9WR', 'rideable_type': 'classic_bike', 'started_at': 2020-12-01 07:28:11, 'ended_at': 2020-12-01 07:34:46, 'start_station_id': '6230.04', 'end_station_id': '5905.12'}
+
+1: {'ride_id': '1MKFAZZ81SDW4SHN', 'rideable_type': 'classic_bike', 'started_at': 2020-12-01 07:00:50, 'ended_at': 2020-12-01 07:25:06, 'start_station_id': '6602.03', 'end_station_id': '6912.01'}
+{'ride_id': 'HL9XPSEIMVIHCWI6', 'rideable_type': 'classic_bike', 'started_at': 2020-12-01 07:01:18, 'ended_at': 2020-12-01 07:20:42, 'start_station_id': '6912.01', 'end_station_id': '6824.07'}
+{'ride_id': '7253J2D54I3QK2IA', 'rideable_type': 'classic_bike', 'started_at': 2020-12-01 07:03:08, 'ended_at': 2020-12-01 07:10:15, 'start_station_id': '6824.07', 'end_station_id': '5905.12'}
+{'ride_id': 'XPJ4HNRIUU9K9XJU', 'rideable_type': 'classic_bike', 'started_at': 2020-12-01 07:08:50, 'ended_at': 2020-12-01 07:24:54, 'start_station_id': '5905.12', 'end_station_id': '6743.06'}
+{'ride_id': 'X3D43E7B7P0RNPM6', 'rideable_type': 'classic_bike', 'started_at': 2020-12-01 07:29:42, 'ended_at': 2020-12-01 07:31:26, 'start_station_id': '5492.05', 'end_station_id': '5779.09'}
+
+1: {'ride_id': '1MKFAZZ81SDW4SHN', 'rideable_type': 'classic_bike', 'started_at': 2020-12-01 07:00:50, 'ended_at': 2020-12-01 07:25:06, 'start_station_id': '6602.03', 'end_station_id': '6912.01'}
+{'ride_id': 'HL9XPSEIMVIHCWI6', 'rideable_type': 'classic_bike', 'started_at': 2020-12-01 07:01:18, 'ended_at': 2020-12-01 07:20:42, 'start_station_id': '6912.01', 'end_station_id': '6824.07'}
+{'ride_id': '7253J2D54I3QK2IA', 'rideable_type': 'classic_bike', 'started_at': 2020-12-01 07:03:08, 'ended_at': 2020-12-01 07:10:15, 'start_station_id': '6824.07', 'end_station_id': '5905.12'}
+{'ride_id': 'EUC1HH5LF6A4FEJG', 'rideable_type': 'classic_bike', 'started_at': 2020-12-01 07:10:09, 'ended_at': 2020-12-01 07:38:00, 'start_station_id': '5905.12', 'end_station_id': '5779.09'}
+{'ride_id': 'VML90PXRLZU6WMX3', 'rideable_type': 'classic_bike', 'started_at': 2020-12-01 07:31:00, 'ended_at': 2020-12-01 07:44:45, 'start_station_id': '6824.07', 'end_station_id': '6822.09'}
+
+1: {'ride_id': '1MKFAZZ81SDW4SHN', 'rideable_type': 'classic_bike', 'started_at': 2020-12-01 07:00:50, 'ended_at': 2020-12-01 07:25:06, 'start_station_id': '6602.03', 'end_station_id': '6912.01'}
+{'ride_id': 'HL9XPSEIMVIHCWI6', 'rideable_type': 'classic_bike', 'started_at': 2020-12-01 07:01:18, 'ended_at': 2020-12-01 07:20:42, 'start_station_id': '6912.01', 'end_station_id': '6824.07'}
+{'ride_id': '7253J2D54I3QK2IA', 'rideable_type': 'classic_bike', 'started_at': 2020-12-01 07:03:08, 'ended_at': 2020-12-01 07:10:15, 'start_station_id': '6824.07', 'end_station_id': '5905.12'}
+{'ride_id': 'ILGB0S0R2SDS8B25', 'rideable_type': 'classic_bike', 'started_at': 2020-12-01 07:10:14, 'ended_at': 2020-12-01 07:11:44, 'start_station_id': '5905.12', 'end_station_id': '6912.01'}
+{'ride_id': 'RDHW9RE2Q6JXNNNG', 'rideable_type': 'classic_bike', 'started_at': 2020-12-01 07:32:28, 'ended_at': 2020-12-01 07:43:31, 'start_station_id': '6822.09', 'end_station_id': '6822.09'}
+
+2: {'ride_id': 'IOYKL1CQ99CHJ755', 'rideable_type': 'electric_bike', 'started_at': 2020-12-01 07:02:12, 'ended_at': 2020-12-01 07:10:10, 'start_station_id': '6822.09', 'end_station_id': '6824.07'}
+{'ride_id': '26RJRNY20479T6VX', 'rideable_type': 'electric_bike', 'started_at': 2020-12-01 07:05:01, 'ended_at': 2020-12-01 07:24:23, 'start_station_id': '6824.07', 'end_station_id': '6824.07'}
+{'ride_id': '5BCW790PDW5PY6B2', 'rideable_type': 'electric_bike', 'started_at': 2020-12-01 07:08:26, 'ended_at': 2020-12-01 07:30:49, 'start_station_id': '6824.07', 'end_station_id': '6912.01'}
+{'ride_id': '2L44Y9IK01L0VDP6', 'rideable_type': 'electric_bike', 'started_at': 2020-12-01 07:33:25, 'ended_at': 2020-12-01 07:47:07, 'start_station_id': '5351.03', 'end_station_id': '5905.12'}
+
+2: {'ride_id': 'Y6452H2ZQU7EEQTU', 'rideable_type': 'electric_bike', 'started_at': 2020-12-01 07:04:22, 'ended_at': 2020-12-01 07:19:00, 'start_station_id': '5779.09', 'end_station_id': '5593.04'}
+{'ride_id': '7S55J2O7S3KKV9RF', 'rideable_type': 'electric_bike', 'started_at': 2020-12-01 07:07:43, 'ended_at': 2020-12-01 07:27:31, 'start_station_id': '5593.04', 'end_station_id': '6004.06'}
+{'ride_id': 'TU2GC5WI6FQJJA26', 'rideable_type': 'electric_bike', 'started_at': 2020-12-01 07:08:40, 'ended_at': 2020-12-01 07:22:27, 'start_station_id': '6004.06', 'end_station_id': '5593.04'}
+{'ride_id': 'C2CZO2SUG5HCBBMH', 'rideable_type': 'electric_bike', 'started_at': 2020-12-01 07:33:43, 'ended_at': 2020-12-01 08:00:38, 'start_station_id': '6602.03', 'end_station_id': '5905.12'}
+
+2: {'ride_id': 'FGSXW71Q3VLI7KQ1', 'rideable_type': 'electric_bike', 'started_at': 2020-12-01 07:05:39, 'ended_at': 2020-12-01 07:19:00, 'start_station_id': '6822.09', 'end_station_id': '6230.04'}
+{'ride_id': 'RMJKV5USGIOTIRZQ', 'rideable_type': 'electric_bike', 'started_at': 2020-12-01 07:05:56, 'ended_at': 2020-12-01 07:07:54, 'start_station_id': '6230.04', 'end_station_id': '5905.12'}
+{'ride_id': 'E153A5QBSWRPBJEK', 'rideable_type': 'electric_bike', 'started_at': 2020-12-01 07:07:11, 'ended_at': 2020-12-01 07:11:11, 'start_station_id': '5905.12', 'end_station_id': '5788.12'}
+{'ride_id': 'I2HGJ11YEDWB2BNE', 'rideable_type': 'electric_bike', 'started_at': 2020-12-01 07:08:56, 'ended_at': 2020-12-01 07:38:21, 'start_station_id': '5788.12', 'end_station_id': '6912.01'}
+{'ride_id': 'EBNVG5VMF60YKNFU', 'rideable_type': 'electric_bike', 'started_at': 2020-12-01 07:33:59, 'ended_at': 2020-12-01 07:52:13, 'start_station_id': '6004.06', 'end_station_id': '6822.09'}
+
+1: {'ride_id': '1MKFAZZ81SDW4SHN', 'rideable_type': 'classic_bike', 'started_at': 2020-12-01 07:00:50, 'ended_at': 2020-12-01 07:25:06, 'start_station_id': '6602.03', 'end_station_id': '6912.01'}
+{'ride_id': 'HL9XPSEIMVIHCWI6', 'rideable_type': 'classic_bike', 'started_at': 2020-12-01 07:01:18, 'ended_at': 2020-12-01 07:20:42, 'start_station_id': '6912.01', 'end_station_id': '6824.07'}
+{'ride_id': 'X5T5P5O3O0LLJ8YR', 'rideable_type': 'classic_bike', 'started_at': 2020-12-01 07:10:46, 'ended_at': 2020-12-01 07:38:50, 'start_station_id': '6824.07', 'end_station_id': '5492.05'}
+{'ride_id': 'JOA21A6XVAJ2K8XP', 'rideable_type': 'classic_bike', 'started_at': 2020-12-01 07:34:10, 'ended_at': 2020-12-01 07:57:15, 'start_station_id': '5779.09', 'end_station_id': '6822.09'}
+
+2: {'ride_id': 'Y6452H2ZQU7EEQTU', 'rideable_type': 'electric_bike', 'started_at': 2020-12-01 07:04:22, 'ended_at': 2020-12-01 07:19:00, 'start_station_id': '5779.09', 'end_station_id': '5593.04'}
+{'ride_id': '7S55J2O7S3KKV9RF', 'rideable_type': 'electric_bike', 'started_at': 2020-12-01 07:07:43, 'ended_at': 2020-12-01 07:27:31, 'start_station_id': '5593.04', 'end_station_id': '6004.06'}
+{'ride_id': 'ET8T63J3R30ME8F8', 'rideable_type': 'electric_bike', 'started_at': 2020-12-01 07:09:10, 'ended_at': 2020-12-01 07:35:40, 'start_station_id': '6004.06', 'end_station_id': '5593.04'}
+{'ride_id': 'KSWVA984UVKYRMJL', 'rideable_type': 'electric_bike', 'started_at': 2020-12-01 07:34:27, 'ended_at': 2020-12-01 07:51:07, 'start_station_id': '5788.12', 'end_station_id': '5779.09'}
+
+2: {'ride_id': 'IOYKL1CQ99CHJ755', 'rideable_type': 'electric_bike', 'started_at': 2020-12-01 07:02:12, 'ended_at': 2020-12-01 07:10:10, 'start_station_id': '6822.09', 'end_station_id': '6824.07'}
+{'ride_id': '26RJRNY20479T6VX', 'rideable_type': 'electric_bike', 'started_at': 2020-12-01 07:05:01, 'ended_at': 2020-12-01 07:24:23, 'start_station_id': '6824.07', 'end_station_id': '6824.07'}
+{'ride_id': 'P84DYT9MOGE4QXXV', 'rideable_type': 'electric_bike', 'started_at': 2020-12-01 07:10:04, 'ended_at': 2020-12-01 07:12:11, 'start_station_id': '6824.07', 'end_station_id': '5905.12'}
+{'ride_id': 'GSIC43OLFARK6O0U', 'rideable_type': 'electric_bike', 'started_at': 2020-12-01 07:34:40, 'ended_at': 2020-12-01 07:58:03, 'start_station_id': '6824.07', 'end_station_id': '6822.09'}
+
+2: {'ride_id': 'ROYR6CCVCJWTL9TQ', 'rideable_type': 'electric_bike', 'started_at': 2020-12-01 07:10:28, 'ended_at': 2020-12-01 07:33:25, 'start_station_id': '5351.03', 'end_station_id': '5351.03'}
+{'ride_id': 'FXC08DTNQFLL7V5F', 'rideable_type': 'electric_bike', 'started_at': 2020-12-01 07:11:18, 'ended_at': 2020-12-01 07:24:16, 'start_station_id': '5351.03', 'end_station_id': '5593.04'}
+{'ride_id': 'T26YS445GDEJ31GY', 'rideable_type': 'electric_bike', 'started_at': 2020-12-01 07:34:51, 'ended_at': 2020-12-01 08:00:38, 'start_station_id': '6824.07', 'end_station_id': '5779.09'}
+
+1: {'ride_id': 'F8MDD4V30T9NT3W5', 'rideable_type': 'classic_bike', 'started_at': 2020-12-01 07:00:05, 'ended_at': 2020-12-01 07:24:54, 'start_station_id': '6004.06', 'end_station_id': '5905.12'}
+{'ride_id': 'EN93IIUC039TEX8F', 'rideable_type': 'classic_bike', 'started_at': 2020-12-01 07:01:00, 'ended_at': 2020-12-01 07:22:26, 'start_station_id': '5905.12', 'end_station_id': '6230.04'}
+{'ride_id': 'V1V93KMKZEBBK7W1', 'rideable_type': 'classic_bike', 'started_at': 2020-12-01 07:06:12, 'ended_at': 2020-12-01 07:32:24, 'start_station_id': '6230.04', 'end_station_id': '5788.12'}
+{'ride_id': 'PGB7R3OCWBFUK9E1', 'rideable_type': 'classic_bike', 'started_at': 2020-12-01 07:06:20, 'ended_at': 2020-12-01 07:26:55, 'start_station_id': '5788.12', 'end_station_id': '6230.04'}
+{'ride_id': 'D4N1U3493WXA73JG', 'rideable_type': 'classic_bike', 'started_at': 2020-12-01 07:11:04, 'ended_at': 2020-12-01 07:34:28, 'start_station_id': '6230.04', 'end_station_id': '5779.09'}
+{'ride_id': '5P5NVQEBWUWQHEYT', 'rideable_type': 'classic_bike', 'started_at': 2020-12-01 07:35:06, 'ended_at': 2020-12-01 07:43:41, 'start_station_id': '5905.12', 'end_station_id': '5779.09'}
+
+1: {'ride_id': 'F8MDD4V30T9NT3W5', 'rideable_type': 'classic_bike', 'started_at': 2020-12-01 07:00:05, 'ended_at': 2020-12-01 07:24:54, 'start_station_id': '6004.06', 'end_station_id': '5905.12'}
+{'ride_id': 'EN93IIUC039TEX8F', 'rideable_type': 'classic_bike', 'started_at': 2020-12-01 07:01:00, 'ended_at': 2020-12-01 07:22:26, 'start_station_id': '5905.12', 'end_station_id': '6230.04'}
+{'ride_id': 'V1V93KMKZEBBK7W1', 'rideable_type': 'classic_bike', 'started_at': 2020-12-01 07:06:12, 'ended_at': 2020-12-01 07:32:24, 'start_station_id': '6230.04', 'end_station_id': '5788.12'}
+{'ride_id': 'PGB7R3OCWBFUK9E1', 'rideable_type': 'classic_bike', 'started_at': 2020-12-01 07:06:20, 'ended_at': 2020-12-01 07:26:55, 'start_station_id': '5788.12', 'end_station_id': '6230.04'}
+{'ride_id': 'RPJ1EPKYRYBOVAKH', 'rideable_type': 'classic_bike', 'started_at': 2020-12-01 07:11:24, 'ended_at': 2020-12-01 07:21:41, 'start_station_id': '6230.04', 'end_station_id': '6822.09'}
+{'ride_id': 'OU6QLZ2RWGWAJ1G1', 'rideable_type': 'classic_bike', 'started_at': 2020-12-01 07:35:24, 'ended_at': 2020-12-01 07:41:32, 'start_station_id': '5593.04', 'end_station_id': '5779.09'}
+
+2: {'ride_id': 'IOYKL1CQ99CHJ755', 'rideable_type': 'electric_bike', 'started_at': 2020-12-01 07:02:12, 'ended_at': 2020-12-01 07:10:10, 'start_station_id': '6822.09', 'end_station_id': '6824.07'}
+{'ride_id': '26RJRNY20479T6VX', 'rideable_type': 'electric_bike', 'started_at': 2020-12-01 07:05:01, 'ended_at': 2020-12-01 07:24:23, 'start_station_id': '6824.07', 'end_station_id': '6824.07'}
+{'ride_id': 'P84DYT9MOGE4QXXV', 'rideable_type': 'electric_bike', 'started_at': 2020-12-01 07:10:04, 'ended_at': 2020-12-01 07:12:11, 'start_station_id': '6824.07', 'end_station_id': '5905.12'}
+{'ride_id': 'RPETIUYMO0PQCLPO', 'rideable_type': 'electric_bike', 'started_at': 2020-12-01 07:11:33, 'ended_at': 2020-12-01 07:22:25, 'start_station_id': '5905.12', 'end_station_id': '5492.05'}
+{'ride_id': 'YAPDSWZP6SWK2RV2', 'rideable_type': 'electric_bike', 'started_at': 2020-12-01 07:36:17, 'ended_at': 2020-12-01 08:01:14, 'start_station_id': '5593.04', 'end_station_id': '5779.09'}
+
+2: {'ride_id': 'IOYKL1CQ99CHJ755', 'rideable_type': 'electric_bike', 'started_at': 2020-12-01 07:02:12, 'ended_at': 2020-12-01 07:10:10, 'start_station_id': '6822.09', 'end_station_id': '6824.07'}
+{'ride_id': 'EP7Y6WKTAKPUXQPH', 'rideable_type': 'electric_bike', 'started_at': 2020-12-01 07:03:45, 'ended_at': 2020-12-01 07:18:29, 'start_station_id': '6824.07', 'end_station_id': '5788.12'}
+{'ride_id': 'I2HGJ11YEDWB2BNE', 'rideable_type': 'electric_bike', 'started_at': 2020-12-01 07:08:56, 'ended_at': 2020-12-01 07:38:21, 'start_station_id': '5788.12', 'end_station_id': '6912.01'}
+{'ride_id': 'JEN0JNWNYQW7LVXW', 'rideable_type': 'electric_bike', 'started_at': 2020-12-01 07:09:27, 'ended_at': 2020-12-01 07:13:31, 'start_station_id': '6912.01', 'end_station_id': '6004.06'}
+{'ride_id': 'L2W37D4IVSOLMLGS', 'rideable_type': 'electric_bike', 'started_at': 2020-12-01 07:11:51, 'ended_at': 2020-12-01 07:16:46, 'start_station_id': '6004.06', 'end_station_id': '5351.03'}
+{'ride_id': 'Y8NBIQUWRXZE1HM3', 'rideable_type': 'electric_bike', 'started_at': 2020-12-01 07:37:45, 'ended_at': 2020-12-01 07:56:06, 'start_station_id': '6602.03', 'end_station_id': '5779.09'}
+
+1: {'ride_id': '1MKFAZZ81SDW4SHN', 'rideable_type': 'classic_bike', 'started_at': 2020-12-01 07:00:50, 'ended_at': 2020-12-01 07:25:06, 'start_station_id': '6602.03', 'end_station_id': '6912.01'}
+{'ride_id': 'HL9XPSEIMVIHCWI6', 'rideable_type': 'classic_bike', 'started_at': 2020-12-01 07:01:18, 'ended_at': 2020-12-01 07:20:42, 'start_station_id': '6912.01', 'end_station_id': '6824.07'}
+{'ride_id': '7253J2D54I3QK2IA', 'rideable_type': 'classic_bike', 'started_at': 2020-12-01 07:03:08, 'ended_at': 2020-12-01 07:10:15, 'start_station_id': '6824.07', 'end_station_id': '5905.12'}
+{'ride_id': '8XFDJGF1C8WQUUY5', 'rideable_type': 'classic_bike', 'started_at': 2020-12-01 07:11:59, 'ended_at': 2020-12-01 07:39:28, 'start_station_id': '5905.12', 'end_station_id': '5905.12'}
+{'ride_id': 'Q9C80EBKJF4AQ7B7', 'rideable_type': 'classic_bike', 'started_at': 2020-12-01 07:39:17, 'ended_at': 2020-12-01 08:06:46, 'start_station_id': '6824.07', 'end_station_id': '5779.09'}
+
+1: {'ride_id': '1MKFAZZ81SDW4SHN', 'rideable_type': 'classic_bike', 'started_at': 2020-12-01 07:00:50, 'ended_at': 2020-12-01 07:25:06, 'start_station_id': '6602.03', 'end_station_id': '6912.01'}
+{'ride_id': 'HL9XPSEIMVIHCWI6', 'rideable_type': 'classic_bike', 'started_at': 2020-12-01 07:01:18, 'ended_at': 2020-12-01 07:20:42, 'start_station_id': '6912.01', 'end_station_id': '6824.07'}
+{'ride_id': 'UXLEZ896DYSAL8M1', 'rideable_type': 'classic_bike', 'started_at': 2020-12-01 07:12:51, 'ended_at': 2020-12-01 07:34:09, 'start_station_id': '6824.07', 'end_station_id': '5492.05'}
+{'ride_id': 'IX7IB5N2EJ0AS1SS', 'rideable_type': 'classic_bike', 'started_at': 2020-12-01 07:39:43, 'ended_at': 2020-12-01 07:44:37, 'start_station_id': '6822.09', 'end_station_id': '5905.12'}
+
+1: {'ride_id': '1MKFAZZ81SDW4SHN', 'rideable_type': 'classic_bike', 'started_at': 2020-12-01 07:00:50, 'ended_at': 2020-12-01 07:25:06, 'start_station_id': '6602.03', 'end_station_id': '6912.01'}
+{'ride_id': 'SPK9P38QOLDFORXO', 'rideable_type': 'classic_bike', 'started_at': 2020-12-01 07:07:05, 'ended_at': 2020-12-01 07:34:07, 'start_station_id': '6912.01', 'end_station_id': '5593.04'}
+{'ride_id': '4D145BM1ENF313FP', 'rideable_type': 'classic_bike', 'started_at': 2020-12-01 07:13:02, 'ended_at': 2020-12-01 07:18:43, 'start_station_id': '5593.04', 'end_station_id': '5492.05'}
+{'ride_id': 'S8G8TACY15PDTZ91', 'rideable_type': 'classic_bike', 'started_at': 2020-12-01 07:40:03, 'ended_at': 2020-12-01 07:51:10, 'start_station_id': '6822.09', 'end_station_id': '5779.09'}
