@@ -1,9 +1,7 @@
-import pandas as pd
+import csv
 import pika
 import logging, os, time
 from ride import Ride
-
-from datetime import datetime
 
 QUEUE_NAME = os.getenv('QUEUE_NAME')
 EXCHANGE_NAME = os.getenv('EXCHANGE_NAME')
@@ -78,9 +76,30 @@ class DataIngest:
         )
         # logger.info(f"Published message: {message}")
 
+class _RowAttr:
+    __slots__ = ("__dict__",)
+    def __init__(self, d: dict):
+        # keep keys as-is; values are strings from CSV
+        self.__dict__ = d
+
 def read_large_file(file_path, chunk_size):
-    for chunk in pd.read_csv(file_path, chunksize=chunk_size):
-        yield chunk
+    chunk = []
+    with open(file_path, "r", encoding="utf-8", newline="") as f:
+        reader = csv.DictReader(f)
+        for d in reader:
+            # normalize to strings; DictReader already yields strings
+            # Keep column names identical to the CSV headers so row.attr works below
+            chunk.append(_RowAttr(d))
+            if len(chunk) >= chunk_size:
+                yield chunk
+                chunk = []
+        if chunk:
+            yield chunk
+
+# # pandas (NOTE: for _, row in chunk.iterrows():, and str(row['ride_id']) etc.)
+# def read_large_file(file_path, chunk_size):
+#     for chunk in pd.read_csv(file_path, chunksize=chunk_size):
+#         yield chunk
 
 def ingestion():
     try:
@@ -90,14 +109,14 @@ def ingestion():
 
         if ingestor.is_connected():
             for chunk in read_large_file(DATAFILE, EVENTS_PER_SECOND):
-                for _, row in chunk.iterrows():
+                for row in chunk:
                     event = Ride(
-                        str(row.ride_id), 
-                        str(row.rideable_type), 
+                        row.ride_id,
+                        row.rideable_type, 
                         row.started_at, 
                         row.ended_at, 
-                        str(row.start_station_id), 
-                        str(row.end_station_id)
+                        row.start_station_id, 
+                        row.end_station_id
                     )
 
                     ingestor.publish_message(event.to_msg())

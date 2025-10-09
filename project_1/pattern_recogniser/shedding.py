@@ -1,5 +1,8 @@
-from prometheus_client import Gauge, Counter
-import collections, time, random
+import os, time, random, threading
+from datetime import timedelta
+from collections import defaultdict, deque
+from prometheus_client import Gauge, Counter, Histogram
+import pika
 
 shed_level_g  = Gauge('shed_level', 'Shedding level (0=off,1,2)')
 events_fwd    = Counter('events_forwarded_total', 'Events forwarded to CEP')
@@ -7,50 +10,104 @@ events_drop   = Counter('events_dropped_total', 'Events dropped by shedding', ['
 matches_total = Counter('matches_total', 'Pattern matches emitted')
 queue_depth_g = Gauge('rabbitmq_queue_depth', 'Queue depth (messages)')
 
+TARGET = {"6822.09","5779.09", "5905.12"}
+
+# queue thresholds
+HIGH = 50000
+LOW  = 20000
+
+# latency thresholds (seconds)
+P95_L1 = 0.03   # 30 ms → go to level 1
+P95_L2 = 0.06   # 60 ms → go to level 2
+
+TAU1 = 0.5
+TAU2 = 2.0
+SAMPLE_MED = 0.5
+
+class LatencyWindow:
+    def __init__(self, max_samples=5000, window_sec=30):
+        self.max = max_samples
+        self.win = window_sec
+        self.samples = deque()  # (ts, value_s)
+
+    def add(self, value_s: float):
+        now = time.time()
+        self.samples.append((now, value_s))
+        self._gc(now)
+
+    def p95(self):
+        now = time.time(); self._gc(now)
+        vals = [v for _, v in self.samples]
+        if not vals: return None
+        vals.sort()
+        idx = int(0.95 * (len(vals) - 1))
+        return vals[idx]
+
+    def _gc(self, now: float):
+        cutoff = now - self.win
+        while self.samples and self.samples[0][0] < cutoff:
+            self.samples.popleft()
+        while len(self.samples) > self.max:
+            self.samples.popleft()
+
+# global instance
+latency_window = LatencyWindow()
+
 class SheddingState:
-    def __init__(self, channel, queue_name, high=50000, low=20000):
-        self.ch, self.q = channel, queue_name
+    def __init__(self, conn_params: pika.ConnectionParameters, queue_name: str,
+                 high:int=HIGH, low:int=LOW, poll_period:float=0.5):
+        self.q = queue_name
         self.high, self.low = high, low
         self.level = 0
+        self._depth = 0
+        self._poll_period = poll_period
+        self._stop = False
+        self._conn_params = conn_params
+        t = threading.Thread(target=self._poller, daemon=True)
+        t.start()
 
-    def depth(self):
-        m = self.ch.queue_declare(queue=self.q, passive=True)
-        d = m.method.message_count
-        queue_depth_g.set(d)
-        return d
+    def _poller(self):
+        conn = pika.BlockingConnection(self._conn_params)
+        ch = conn.channel()
+        try:
+            while not self._stop:
+                try:
+                    m = ch.queue_declare(queue=self.q, passive=True)
+                    self._depth = m.method.message_count
+                    queue_depth_g.set(self._depth)
+                except Exception:
+                    pass
+                time.sleep(self._poll_period)
+        finally:
+            try: ch.close()
+            except Exception: pass
+            try: conn.close()
+            except Exception: pass
 
-    def update(self):
-        d = self.depth()
-        if d >= self.high:
-            self.level = 2
-        elif d <= self.low:
-            self.level = 0
-        else:
-            self.level = max(self.level, 1)
+    def stop(self):
+        self._stop = True
+
+    def update(self) -> int:
+        depth = self._depth
+        p95   = latency_window.p95()
+
+        # Depth-based level
+        depth_level = 2 if depth >= self.high else (1 if depth >= self.low else 0)
+
+        # Latency-based level
+        lat_level = 0
+        if p95 is not None:
+            lat_level = 2 if p95 >= P95_L2 else (1 if p95 >= P95_L1 else 0)
+
+        # Choose the stricter one
+        self.level = max(depth_level, lat_level)
         shed_level_g.set(self.level)
         return self.level
-
-class ChainTracker:
-    def __init__(self):  # best-effort per bike_id
-        self.length = collections.Counter()   # bike_id -> chain length so far
-        self.first_end = {}                   # bike_id -> first a ended_at
-
-    def on_event(self, evt):
-        bid = evt.get("bike_id")
-        if not bid: return
-        if bid not in self.first_end:
-            self.first_end[bid] = evt["ended_at"]
-            self.length[bid] = 1
-        else:
-            self.length[bid] += 1
-
-    def get_len(self, bid):   return self.length.get(bid, 0)
-    def get_start(self, bid): return self.first_end.get(bid)
 
 class RecentEnds:
     def __init__(self, ttl_sec=1800):
         self.ttl = ttl_sec
-        self.deq = collections.deque()  # (ts, station_id)
+        self.deq = deque()  # (ts, station_id)
         self.set = set()
 
     def add(self, sid):
@@ -62,33 +119,71 @@ class RecentEnds:
         cutoff = now - self.ttl
         while self.deq and self.deq[0][0] < cutoff:
             _, old = self.deq.popleft()
-            # remove old if no duplicates remain
             if all(x != old for _, x in self.deq):
                 self.set.discard(old)
 
-    def seen(self, sid): return str(sid).strip() in self.set
+    def seen(self, sid) -> bool:
+        return str(sid or "").strip() in self.set
 
-TARGET = {"6822.09", "5779.09", "5905.12"}
+class TypeChainTracker:
+    def __init__(self, max_gap: timedelta = timedelta(minutes=45)):
+        self.max_gap = max_gap
+        # tails[type][station] -> deque[(last_end_time, length, first_start_time)]
+        self.tails = defaultdict(lambda: defaultdict(deque)) # type: ignore
 
-def utility_score(evt, chains: ChainTracker, recents: RecentEnds):
-    bid = evt.get("bike_id")
-    L   = chains.get_len(bid) if bid else 0
-    s0  = chains.get_start(bid)
+    def on_event(self, evt):
+        typ = (evt.get("rideable_type") or "").strip().lower()
+        s_start = str(evt.get("start_station_id") or "").strip()
+        s_end   = str(evt.get("end_station_id") or "").strip()
+        t_start = evt["started_at"]
+        t_end   = evt["ended_at"]
+
+        dq = self.tails[typ][s_start]
+        cutoff = t_start - self.max_gap
+        while dq and dq[0][0] < cutoff:
+            dq.popleft()
+
+        best = None  # (idx, last_end, length, first_start)
+        for i, (last_end, length, first_start) in enumerate(dq):
+            if last_end <= t_start and (best is None or last_end > best[1]):
+                best = (i, last_end, length, first_start)
+
+        if best is None:
+            prev_len = 0
+            first_start = t_start
+            length = 1
+        else:
+            _, last_end, length0, first_start = best
+            prev_len = length0
+            dq.remove((last_end, length0, first_start))
+            length = length0 + 1
+
+        self.tails[typ][s_end].append((t_end, length, first_start))
+        return prev_len, first_start
+
+def utility_score_type(evt, chains: TypeChainTracker, recents: RecentEnds, targets: set[str]) -> float:
+    """
+    Prioritize:
+      - longer chains (prev_len)
+      - closeness to 1h window (from a[1].start to current ended_at)
+      - ending at target stations
+      - likely handoff (start station was a recent end)
+    """
+    prev_len, first_start = chains.on_event(evt)
+
     near = 0.0
-    if s0:
-        elapsed = (evt["ended_at"] - s0).total_seconds()
-        near = max(0.0, min(1.0, elapsed / 3600.0))  # closer to 1h → nearer completion
-    tail = 1.0 if evt.get("end_station_id") in TARGET else 0.0
+    if first_start:
+        elapsed = (evt["ended_at"] - first_start).total_seconds()
+        near = max(0.0, min(1.0, elapsed / 3600.0))
+
+    tail = 1.0 if str(evt.get("end_station_id") or "").strip() in targets else 0.0
     hand = 1.0 if recents.seen(evt.get("start_station_id")) else 0.0
-    # weights (tune during evaluation):
-    wL, wN, wT, wH = 1.0, 2.0, 3.0, 0.5
-    return wL*L + wN*near + wT*tail + wH*hand
 
-TAU1 = 0.5      # Level-1 keep threshold
-TAU2 = 2.0      # Level-2 keep threshold
-SAMPLE_MED = 0.5
+    # Weights emphasize nearing 1h window & tails at target stations
+    wL, wN, wT, wH = 0.6, 2.2, 3.2, 0.5
+    return wL*prev_len + wN*near + wT*tail + wH*hand
 
-def should_forward(level, score):
+def should_forward(level: int, score: float) -> bool:
     if level == 0:
         return True
     if level == 1:

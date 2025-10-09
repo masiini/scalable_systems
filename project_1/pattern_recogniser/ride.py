@@ -9,7 +9,6 @@ class Ride(Struct):
     ended_at: datetime
     start_station_id: str
     end_station_id: str
-    bike_id: Optional[str] = None
 
 def parse_datetime_hook(type_, obj):
     if type_ is datetime and isinstance(obj, str):

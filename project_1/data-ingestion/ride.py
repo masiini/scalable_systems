@@ -1,3 +1,4 @@
+from typing import Optional
 from msgspec.structs import asdict
 from msgspec import Struct
 from msgspec.json import encode
