@@ -11,16 +11,16 @@ from msgspec.structs import asdict
 
 from ride import Ride, parse_datetime_hook
 from shedding import (
-    SheddingState, TypeChainTracker, RecentEnds,
+    SAMPLE_MED, TAU1, TAU2, SheddingState, TypeChainTracker, RecentEnds,
     utility_score_type, should_forward,
     events_drop, events_fwd, TARGET,
     latency_window
 )
 
 from CEP import CEP
-from condition.Condition import Variable, SimpleCondition, BinaryCondition
+from condition.Condition import Variable, SimpleCondition
 from condition.CompositeCondition import AndCondition
-from condition.KCCondition import KCIndexCondition, KCValueCondition
+from condition.KCCondition import KCIndexCondition
 from misc.ConsumptionPolicy import ConsumptionPolicy, SelectionStrategies
 from base.PatternStructure import AndOperator, SeqOperator, PrimitiveEventStructure, KleeneClosureOperator
 from base.Pattern import Pattern
@@ -57,11 +57,11 @@ BROKER_HOST = os.getenv('BROKER_HOST')
 BROKER_USER = os.getenv('BROKER_USER')
 BROKER_PASS = os.getenv('BROKER_PASS')
 
-BASE_P95 = 0.012340246001258492 # from a no-shed test run
-P95_PERCENTAGE = 0.10 # 10%, 30%, 50%, 70%, 90%
-TARGET_P95 = BASE_P95 * P95_PERCENTAGE
+# BASE_P95 = 0.012340246001258492 # from a no-shed test run
+# P95_PERCENTAGE = 0.10 # 10%, 30%, 50%, 70%, 90%
+TARGET_P95 = None # BASE_P95 * P95_PERCENTAGE
 
-PREFETCH = 1000
+PREFETCH = 200
 KLEENE_MIN = 2
 KLEENE_MAX = 5
 
@@ -178,11 +178,18 @@ class Cepper:
         self.last_msg_ts = time.monotonic()
         t0 = time.perf_counter()
         try:
-            evt = asdict(self.data_formatter.decoder.decode(body))
+            # keep SheddingState fresh, even if we don't use latency target
+            self.shed.update()
+            try:
+                evt = asdict(self.data_formatter.decoder.decode(body))
+            except Exception:
+                events_drop.labels(reason="decode_error").inc()
+                ch.basic_ack(delivery_tag=method.delivery_tag)
+                return
 
             self.recents.add(evt.get("end_station_id"))
+            level = self.shed.update()  # uses queue depth
 
-            level = self.shed.update()  # uses queue depth + local p95
             score = utility_score_type(evt, self.chains, self.recents, TARGET)
 
             if should_forward(level, score):
@@ -193,6 +200,7 @@ class Cepper:
 
             messages_processed.inc()
             ch.basic_ack(delivery_tag=method.delivery_tag)
+
         finally:
             latency_window.add(time.perf_counter() - t0)
 
@@ -214,10 +222,13 @@ class Cepper:
                     elapsed = time.monotonic() - self.last_msg_ts
                     if elapsed > self.timeout_seconds:
                         logger.info(f"No messages received for {self.timeout_seconds}s, stopping...")
-                        self.channel.stop_consuming()
+                        try:
+                            # schedule stop on connection thread to avoid StreamLostError
+                            self.queue_connection.add_callback_threadsafe(self.channel.stop_consuming)
+                        except Exception:
+                            logger.exception("Failed to schedule stop_consuming")
                         dump_metrics()
                         break
-        
         self.monitor_thread = threading.Thread(target=monitor, daemon=True, name="TimeoutMonitor")
         self.monitor_thread.start()
 
@@ -226,11 +237,33 @@ class Cepper:
         self.start_timeout_monitor()
         self.channel.basic_qos(prefetch_count=PREFETCH)
         self.channel.basic_consume(queue=self.queue_name,
-                                   on_message_callback=self.process_messages,
-                                   auto_ack=False)
+                                on_message_callback=self.process_messages,
+                                auto_ack=False)
         logger.info(f"Pattern node: Waiting for messages. Prefetch={PREFETCH}")
         self.channel.start_consuming()
         logger.info("Stopped consuming messages due to timeout")
+
+        try:
+            self.input_stream.close()
+        except Exception:
+            pass
+        try:
+            if getattr(self, "engine", None) and self.engine.is_alive():
+                self.engine.join(timeout=5.0)
+        except Exception:
+            pass
+
+        # stop poller/snapshot helpers
+        try:
+            if self.shed: self.shed.stop()
+        except Exception:
+            pass
+        try:
+            if self.snap_stop: self.snap_stop.set()
+        except Exception:
+            pass
+
+        dump_metrics()
 
 def full_pattern(event_type: str, stations: set[str]):
     """
@@ -319,6 +352,8 @@ def main():
         logger.info("Shutting down...")
     except Exception as e:
         logger.error(e, exc_info=True)
+    finally:
+        dump_metrics()
 
 
 if __name__ == '__main__':
