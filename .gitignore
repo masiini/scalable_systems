@@ -9,3 +9,5 @@ __pycache__
 
 *.log
 /project_1/pattern_recogniser/test
+
+.DS_Store
