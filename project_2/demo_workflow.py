@@ -65,7 +65,7 @@ def _(kuzu):
             response = conn.execute(f"CALL SHOW_CONNECTION('{tbl_name}') RETURN *;")
             for row in response:
                 relationships.append({"name": tbl_name, "from": row[0], "to": row[1]})  # type: ignore
-        schema = {"nodes": [], "edges": []}
+        schema: dict[str, list] = {"nodes": [], "edges": []}
 
         for node in nodes:
             node_schema = {"label": node, "properties": []}

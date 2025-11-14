@@ -1,7 +1,7 @@
 [project]
-name = "marimo-tutorials"
+name = "project_2"
 version = "0.1.0"
-description = "Add your description here"
+description = "A scalable systems project"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
@@ -11,4 +11,6 @@ dependencies = [
     "polars>=1.32.3",
     "pyarrow>=21.0.0",
     "python-dotenv>=1.1.1",
+    "sentence-transformers>=2.2.2",
+    "ipython",
 ]

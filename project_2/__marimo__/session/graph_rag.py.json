@@ -1,0 +1,164 @@
+{
+  "version": "1",
+  "metadata": {
+    "marimo_version": "0.17.7"
+  },
+  "cells": [
+    {
+      "id": "Hbol",
+      "code_hash": "75e0426e588b97832a738b2a2fb8c748",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h1 id=\"graph-rag-using-text2cypher\">Graph RAG using Text2Cypher</h1>\n<span class=\"paragraph\">This is a demo app in marimo that allows you to query the Nobel laureate graph (that's managed in Kuzu) using natural language. A language model takes in the question you enter, translates it to Cypher via a custom Text2Cypher pipeline in Kuzu that's powered by DSPy. The response retrieved from the graph database is then used as context to formulate the answer to the question.</span>\n<blockquote>\n<span class=\"paragraph\">- Powered by Kuzu, DSPy and marimo -</span>\n</blockquote></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "Kclp",
+      "code_hash": null,
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "emfo",
+      "code_hash": "a757171a9df9b4f88349b1d4203632bb",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "MJUe",
+      "code_hash": "0303f3f40256a8317cfbf90a75eb0599",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "vblA",
+      "code_hash": "f4351aba8ba96e6acd7c024eca5d312b",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<marimo-ui-element object-id='MJUe-0' random-id='28ee818d-ba28-5a5e-4f31-efd1d537b946'><marimo-text data-initial-value='&quot;Which scholars won prizes in Physics and were affiliated with University of Cambridge?&quot;' data-label='null' data-placeholder='&quot;&quot;' data-kind='&quot;text&quot;' data-full-width='true' data-disabled='false' data-debounce='true'></marimo-text></marimo-ui-element>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "Xref",
+      "code_hash": "9311d1e22d03765866113aef61f1065e",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "SFPL",
+      "code_hash": "4e5e3c7cca364b5aa65ad0cdd157c9e6",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "BYtC",
+      "code_hash": "6240330a2141bcf589a94d3fd0153876",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "PKri",
+      "code_hash": "5472715544a7eed5fdcca8c2f3e8d185",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "RGSE",
+      "code_hash": "cefafb9ba0473f0f2cd7590310816217",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "bkHC",
+      "code_hash": "54dcaac6cbcceb259961ee38251a42cb",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "lEQa",
+      "code_hash": "694ca7a4ed842361105456017cab21e4",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<div style='display: flex;flex: 1;flex-direction: row;justify-content: space-between;align-items: normal;flex-wrap: nowrap;gap: 0.5rem'><span class=\"markdown prose dark:prose-invert contents\"><h3 id=\"query\">Query</h3>\n<span class=\"paragraph\"><code>RETURN 'hello'</code></span></span><span class=\"markdown prose dark:prose-invert contents\"><h3 id=\"answer\">Answer</h3>\n<span class=\"paragraph\">hello</span></span></div>"
+          }
+        }
+      ],
+      "console": []
+    }
+  ]
+}

@@ -5,6 +5,7 @@ venv
 project_1/data
 
 __pycache__
+.mypy_cache
 
 .vscode
 
@@ -12,3 +13,5 @@ __pycache__
 /project_1/pattern_recogniser/test
 
 .DS_Store
+
+project_2.egg-info/

@@ -147,9 +147,7 @@ def _(db_name, kuzu):
 
 @app.cell
 def _(mo):
-    mo.md(
-        r"""Next, we'll define the schema of our graph, i.e., create the node and relationship tables."""
-    )
+    mo.md(r"""Next, we'll define the schema of our graph, i.e., create the node and relationship tables.""")
     return
 
 
@@ -202,9 +200,7 @@ def _(conn):
 
 @app.cell
 def _(mo):
-    mo.md(
-        r"""Let's now ingest the data for scholars (laureates), prizes and the relationships between them (scholar wins a prize)."""
-    )
+    mo.md(r"""Let's now ingest the data for scholars (laureates), prizes and the relationships between them (scholar wins a prize).""")
     return
 
 
