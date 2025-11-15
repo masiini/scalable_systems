@@ -6,18 +6,14 @@ import re
 from dataclasses import dataclass
 from typing import Any, List
 
-import dspy # type: ignore
+import dspy  # type: ignore
 import kuzu  # type: ignore
-import marimo
 import numpy as np
 from dotenv import load_dotenv
-from dspy.adapters.json_adapter import JSONAdapter # type: ignore
+from dspy.adapters.json_adapter import JSONAdapter  # type: ignore
 from pydantic import BaseModel, Field
 
 load_dotenv()
-
-__generated_with = "0.14.17"
-app = marimo.App(width="medium")
 
 GOOGLE_API_KEY = os.environ.get("GOOGLE_API_KEY")
 
@@ -73,7 +69,8 @@ class Exemplar:
     cypher: str
 
 
-EXEMPLARS: List[Exemplar] = [
+EXEMPLARS: list[Exemplar] = [
+    # 1) Physics laureates (basic category filter)
     Exemplar(
         question="Which scholars won Nobel Prizes in Physics?",
         cypher=(
@@ -83,23 +80,45 @@ EXEMPLARS: List[Exemplar] = [
             "ORDER BY year"
         ),
     ),
+
+    # 2) Scholars affiliated with University of Cambridge
+    #    Assumes Prize --[:AFFILIATED_WITH]-> Institution
     Exemplar(
         question="Which scholars were affiliated with the University of Cambridge?",
         cypher=(
-            "MATCH (s:Scholar)-[:AFFILIATED_WITH]->(i:Institution) "
-            "WHERE toLower(i.name) CONTAINS 'cambridge' "
-            "RETURN s.knownName AS scholar, i.name AS institution"
+            "MATCH (s:Scholar)-[:WON]->(p:Prize)"
+            "-[:AFFILIATED_WITH]->(i:Institution) "
+            "WHERE toLower(i.name) CONTAINS 'university of cambridge' "
+            "RETURN s.knownName AS scholar, i.name AS institution, p.awardYear AS year "
+            "ORDER BY year"
         ),
     ),
+
+    # 3) Scholars from a given birth country who won a certain category
+    Exemplar(
+        question="Which laureates from Denmark won Nobel Prizes in Physics?",
+        cypher=(
+            "MATCH (s:Scholar)-[:WON]->(p:Prize) "
+            "WHERE toLower(p.category) = 'physics' "
+            "AND toLower(s.birthPlaceCountry) = 'denmark' "
+            "RETURN s.knownName AS scholar, p.awardYear AS year "
+            "ORDER BY year"
+        ),
+    ),
+
+    # 4) Female laureates in Chemistry
     Exemplar(
         question="List female Chemistry laureates.",
         cypher=(
             "MATCH (s:Scholar)-[:WON]->(p:Prize) "
             "WHERE toLower(p.category) = 'chemistry' "
             "AND toLower(s.gender) = 'female' "
-            "RETURN s.knownName AS laureate, p.awardYear AS year"
+            "RETURN s.knownName AS laureate, p.awardYear AS year "
+            "ORDER BY year"
         ),
     ),
+
+    # 5) Count laureates per category
     Exemplar(
         question="How many laureates won prizes in each category?",
         cypher=(
@@ -109,12 +128,26 @@ EXEMPLARS: List[Exemplar] = [
             "ORDER BY total DESC"
         ),
     ),
+
+    # 6) Institutions where a given laureate was affiliated
+    Exemplar(
+        question="Where was Aage N. Bohr affiliated when he received his Nobel Prize?",
+        cypher=(
+            "MATCH (s:Scholar {knownName: 'Aage N. Bohr'})-[:WON]->(p:Prize)"
+            "-[:AFFILIATED_WITH]->(i:Institution) "
+            "RETURN i.name AS institution, i.city AS city, i.country AS country, "
+            "p.category AS category, p.awardYear AS year "
+            "ORDER BY year"
+        ),
+    ),
 ]
+
 
 
 print(f"SBERT: {_SBERT_AVAILABLE}")
 if _SBERT_AVAILABLE:
     _sbert = SentenceTransformer("all-MiniLM-L6-v2")
+
     # SBERT-based embedding
     def _embed(texts: list[str]) -> np.ndarray:
         return np.array(_sbert.encode(texts, normalize_embeddings=True))
@@ -137,7 +170,7 @@ _EX_Q_EMB = _embed([e.question for e in EXEMPLARS])
 
 def select_exemplars(question: str, k: int = 2) -> list[Exemplar]:
     qv = _embed([question])[0]
-    sims = _EX_Q_EMB @ qv # cosine similarity
+    sims = _EX_Q_EMB @ qv  # cosine similarity
     idx = np.argsort(-sims)[:k]
     return [EXEMPLARS[i] for i in idx]
 
@@ -243,11 +276,13 @@ class AnswerQuestion(dspy.Signature):
 # DSPy / LM configuration
 # ---------------------------------------------------------------------------
 
+
 lm = dspy.LM(
     model="gemini/gemini-2.0-flash",
     api_key=GOOGLE_API_KEY,
 )
 dspy.configure(lm=lm, adapter=JSONAdapter())
+
 
 # ---------------------------------------------------------------------------
 # Kuzu
@@ -304,8 +339,8 @@ class KuzuDatabaseManager:
         for rel in relationships:
             edge = {
                 "label": rel["name"],
-                "from": rel["from"],
-                "to": rel["to"],
+                "from": {"label": rel["from"]},  # <-- wrap as dict
+                "to": {"label": rel["to"]},      # <-- wrap as dict
                 "properties": [],
             }
             rel_properties = self.conn.execute(
@@ -398,7 +433,7 @@ class GraphRAG(dspy.Module):
 
         # Execute the Cypher query and serialize results as context
         result = conn.execute(q.query)
-        cols = result.get_column_names() # type: ignore
+        cols = result.get_column_names()  # type: ignore
         rows = [dict(zip(cols, row)) for row in result]
         context = repr(rows)
 
@@ -451,70 +486,19 @@ def run_graph_rag(
 
 
 # ---------------------------------------------------------------------------
-# marimo UI cells
+# CLI Entrypoint
 # ---------------------------------------------------------------------------
 
 
-@app.cell
-def _(mo=marimo):
-    mo.md(
-        r"""
-# Graph RAG using Text2Cypher
-
-This is a demo app in marimo that allows you to query the Nobel laureate graph (managed in Kuzu) using natural language. A language model takes in the question you enter, translates it to Cypher via a custom Text2Cypher pipeline in Kuzu that's powered by DSPy. The response retrieved from the graph database is then used as context to formulate the answer to the question.
-
-> - Powered by Kuzu, DSPy and marimo -
-"""
-    )
-    return
-
-
-@app.cell
-def _(mo=marimo):
-    text_ui = mo.ui.text(
-        value="Which scholars won prizes in Physics and were affiliated with University of Cambridge?",
-        full_width=True,
-    )
-    return (text_ui,)
-
-
-@app.cell
-def _(text_ui):
-    # display the text input widget
-    text_ui
-    return
-
-
-@app.cell
-def _(
-    KuzuDatabaseManager=KuzuDatabaseManager,
-    mo=marimo,
-    run_graph_rag=run_graph_rag,
-    text_ui=None,
-):
-    db_name = "nobel.kuzu"
-    db_manager = KuzuDatabaseManager(db_name)
-
-    question = text_ui.value if text_ui is not None else ""
-
-    with mo.status.spinner(title="Generating answer...") as _spinner:
-        result = run_graph_rag([question], db_manager)[0]
-
-    query = result["query"]
-    answer = result["answer"].response
-    return answer, query
-
-
-@app.cell
-def _(answer, mo=marimo, query=None):
-    mo.hstack(
-        [
-            mo.md(f"### Query\n```{query}```"),
-            mo.md(f"### Answer\n{answer}"),
-        ]
-    )
-    return
-
-
 if __name__ == "__main__":
-    app.run()
+    db = KuzuDatabaseManager("nobel.kuzu")
+    questions = [
+        "Which scholars won Nobel Prizes in Physics?",
+    ]
+    results = run_graph_rag(questions, db)
+
+    for q, res in zip(questions, results):
+        print("Question:", q)
+        print("Cypher:\n", res["query"])
+        print("\nAnswer:\n", res["answer"].response)
+        print("-" * 40)

@@ -1,0 +1,60 @@
+{
+  "version": "1",
+  "metadata": {
+    "marimo_version": "0.17.8"
+  },
+  "cells": [
+    {
+      "id": "Hbol",
+      "code_hash": "51f007635f1f3ebbebdf5b75e1b8f43d",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><span class=\"paragraph\">This is a demo app that lets you query the Nobel laureate graph\n(stored in Kuzu) using natural language.</span>\n<ul>\n<li>Your question \u2192 Cypher via a DSPy Text2Cypher pipeline  </li>\n<li>Cypher runs on Kuzu  </li>\n<li>Results are fed back to the LLM to generate an answer  </li>\n</ul>\n<blockquote>\n<span class=\"paragraph\">Powered by Kuzu, DSPy, and marimo.</span>\n</blockquote></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "MJUe",
+      "code_hash": "9e3840d1e4a28720f9c48c22e07be611",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<div style='display: flex;flex: 1;flex-direction: column;justify-content: flex-start;align-items: normal;flex-wrap: nowrap;gap: 0.5rem'><marimo-ui-element object-id='MJUe-0' random-id='66cded08-81ba-cccf-d11f-1b010ca77c05'><marimo-text data-initial-value='&quot;Which scholars won prizes in Physics and were affiliated with University of Cambridge?&quot;' data-label='&quot;&lt;span class=&#92;&quot;markdown prose dark:prose-invert contents&#92;&quot;&gt;&lt;span class=&#92;&quot;paragraph&#92;&quot;&gt;Question&lt;/span&gt;&lt;/span&gt;&quot;' data-placeholder='&quot;&quot;' data-kind='&quot;text&quot;' data-full-width='false' data-disabled='false' data-debounce='true'></marimo-text></marimo-ui-element><marimo-ui-element object-id='MJUe-1' random-id='68136273-05b3-b553-52a9-2a15fb564fe6'><marimo-button data-initial-value='0' data-label='&quot;&lt;span class=&#92;&quot;markdown prose dark:prose-invert contents&#92;&quot;&gt;&lt;span class=&#92;&quot;paragraph&#92;&quot;&gt;Run&lt;/span&gt;&lt;/span&gt;&quot;' data-kind='&quot;neutral&quot;' data-disabled='false' data-full-width='false'></marimo-button></marimo-ui-element></div>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "vblA",
+      "code_hash": "eac7f15167da180e470fd4d1506b59a1",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "bkHC",
+      "code_hash": "be15f4e548a7964ebdf34523f75a3d0c",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<div style='display: flex;flex: 1;flex-direction: column;justify-content: flex-start;align-items: normal;flex-wrap: nowrap;gap: 0.5rem'><span class=\"markdown prose dark:prose-invert contents\"><h3 id=\"query\">Query</h3>\n<div class=\"language-cypher codehilite\"><pre><span></span><code><span class=\"k\">MATCH</span><span class=\"w\"> </span><span class=\"p\">(</span><span class=\"n\">s</span><span class=\"p\">:</span><span class=\"n\">Scholar</span><span class=\"p\">)</span><span class=\"o\">-[</span><span class=\"p\">:</span><span class=\"n\">WON</span><span class=\"o\">]-&gt;</span><span class=\"p\">(</span><span class=\"n\">p</span><span class=\"p\">:</span><span class=\"n\">Prize</span><span class=\"p\">),</span><span class=\"w\"> </span><span class=\"p\">(</span><span class=\"n\">s</span><span class=\"p\">)</span><span class=\"o\">-[</span><span class=\"p\">:</span><span class=\"n\">AFFILIATED_WITH</span><span class=\"o\">]-&gt;</span><span class=\"p\">(</span><span class=\"n\">i</span><span class=\"p\">:</span><span class=\"n\">Institution</span><span class=\"p\">)</span><span class=\"w\"> </span><span class=\"k\">WHERE</span><span class=\"w\"> </span><span class=\"n\">toLower</span><span class=\"p\">(</span><span class=\"n\">p</span><span class=\"p\">.</span><span class=\"n\">category</span><span class=\"p\">)</span><span class=\"w\"> </span><span class=\"n\">CONTAINS</span><span class=\"w\"> </span><span class=\"s\">&#39;physics&#39;</span><span class=\"w\"> </span><span class=\"n\">AND</span><span class=\"w\"> </span><span class=\"n\">toLower</span><span class=\"p\">(</span><span class=\"n\">i</span><span class=\"p\">.</span><span class=\"n\">name</span><span class=\"p\">)</span><span class=\"w\"> </span><span class=\"n\">CONTAINS</span><span class=\"w\"> </span><span class=\"s\">&#39;university of cambridge&#39;</span><span class=\"w\"> </span><span class=\"k\">RETURN</span><span class=\"w\"> </span><span class=\"n\">s</span><span class=\"p\">.</span><span class=\"n\">knownName</span><span class=\"w\"> </span><span class=\"k\">AS</span><span class=\"w\"> </span><span class=\"n\">scholar</span>\n</code></pre></div></span><span class=\"markdown prose dark:prose-invert contents\"><h3 id=\"answer\">Answer</h3>\n<span class=\"paragraph\">The scholars who won prizes in Physics and were affiliated with University of Cambridge are: Antony Hewish, Brian D. Josephson, C.T.R. Wilson, Didier Queloz, J.J. Thomson, Martin Ryle, Paul A.M. Dirac, and Sir Nevill F. Mott.</span></span><span class=\"markdown prose dark:prose-invert contents\"><h3 id=\"debug\">Debug</h3>\n<div class=\"language-python codehilite\"><pre><span></span><code><span class=\"p\">{</span><span class=\"s1\">&#39;run_btn_value&#39;</span><span class=\"p\">:</span> <span class=\"kc\">True</span><span class=\"p\">,</span> <span class=\"s1\">&#39;question&#39;</span><span class=\"p\">:</span> <span class=\"s1\">&#39;Which scholars won prizes in Physics and were affiliated with University of Cambridge?&#39;</span><span class=\"p\">,</span> <span class=\"s1\">&#39;result_type&#39;</span><span class=\"p\">:</span> <span class=\"s1\">&#39;list&#39;</span><span class=\"p\">,</span> <span class=\"s1\">&#39;result_repr&#39;</span><span class=\"p\">:</span> <span class=\"s1\">&#39;[{</span><span class=\"se\">\\&#39;</span><span class=\"s1\">question</span><span class=\"se\">\\&#39;</span><span class=\"s1\">: </span><span class=\"se\">\\&#39;</span><span class=\"s1\">Which scholars won prizes in Physics and were affiliated with University of Cambridge?</span><span class=\"se\">\\&#39;</span><span class=\"s1\">, </span><span class=\"se\">\\&#39;</span><span class=\"s1\">query</span><span class=\"se\">\\&#39;</span><span class=\"s1\">: &quot;MATCH (s:Scholar)-[:WON]-&gt;(p:Prize), (s)-[:AFFILIATED_WITH]-&gt;(i:Institution) WHERE toLower(p.category) CONTAINS </span><span class=\"se\">\\&#39;</span><span class=\"s1\">physics</span><span class=\"se\">\\&#39;</span><span class=\"s1\"> AND toLower(i.name) CONTAINS </span><span class=\"se\">\\&#39;</span><span class=\"s1\">university of cambridge</span><span class=\"se\">\\&#39;</span><span class=\"s1\"> RETURN s.knownName AS scholar&quot;, </span><span class=\"se\">\\&#39;</span><span class=\"s1\">answer</span><span class=\"se\">\\&#39;</span><span class=\"s1\">: Prediction(</span><span class=\"se\">\\n</span><span class=\"s1\">    reasoning=</span><span class=\"se\">\\&#39;</span><span class=\"s1\">The Cypher query retrieves scholars who have won prizes in Physics and are affiliated with the University of Cambridge. The context provides a list of scholars who satisfy these criteria. Therefore, the response should list these scholars.</span><span class=\"se\">\\&#39;</span><span class=\"s1\">,</span><span class=\"se\">\\n</span><span class=\"s1\">    response=</span><span class=\"se\">\\&#39;</span><span class=\"s1\">The scholars who won prizes in Physics and were affiliated with University of Cambridge are: Antony Hewish, Brian D. Josephson, C.T.R. Wilson, Didier Queloz, J.J. Thomson, Martin Ryle, Paul A.M. Dirac, and Sir Nevill F. Mott.</span><span class=\"se\">\\&#39;\\n</span><span class=\"s1\">), </span><span class=\"se\">\\&#39;</span><span class=\"s1\">debug</span><span class=\"se\">\\&#39;</span><span class=\"s1\">: {</span><span class=\"se\">\\&#39;</span><span class=\"s1\">picked_exemplars</span><span class=\"se\">\\&#39;</span><span class=\"s1\">: [</span><span class=\"se\">\\&#39;</span><span class=\"s1\">Which scholars won Nobel Prizes in Physics?</span><span class=\"se\">\\&#39;</span><span class=\"s1\">, </span><span class=\"se\">\\&#39;</span><span class=\"s1\">Which scholars were affiliated with the University of Cambridge?</span><span class=\"se\">\\&#39;</span><span class=\"s1\">], </span><span class=\"se\">\\&#39;</span><span class=\"s1\">exempl&#39;</span><span class=\"p\">,</span> <span class=\"s1\">&#39;parsed_keys&#39;</span><span class=\"p\">:</span> <span class=\"p\">[</span><span class=\"s1\">&#39;question&#39;</span><span class=\"p\">,</span> <span class=\"s1\">&#39;query&#39;</span><span class=\"p\">,</span> <span class=\"s1\">&#39;answer&#39;</span><span class=\"p\">,</span> <span class=\"s1\">&#39;debug&#39;</span><span class=\"p\">]}</span>\n</code></pre></div></span></div>"
+          }
+        }
+      ],
+      "console": []
+    }
+  ]
+}
