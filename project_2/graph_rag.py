@@ -94,6 +94,7 @@ def _(GraphSchema, Query, dspy):
         """
 
         question: str = dspy.InputField()
+        context: str = dspy.InputField()
         input_schema: str = dspy.InputField()
         query: Query = dspy.OutputField()
 
@@ -109,16 +110,27 @@ def _(GraphSchema, Query, dspy):
         cypher_query: str = dspy.InputField()
         context: str = dspy.InputField()
         response: str = dspy.OutputField()
-    return AnswerQuestion, PruneSchema, Text2Cypher
+
+    class RepairText2Cypher(dspy.Signature):
+        """
+        Repair an invalid Cypher query using schema + EXPLAIN error.
+        Keep intent; output ONE LINE, no trailing semicolon.
+        """
+
+        question: str = dspy.InputField()
+        input_schema: str = dspy.InputField()
+        previous_query: str = dspy.InputField()
+        error_message: str = dspy.InputField()
+        repaired: Query = dspy.OutputField()
+    return AnswerQuestion, PruneSchema, RepairText2Cypher, Text2Cypher
 
 
 @app.cell
-def _(BAMLAdapter, OPENROUTER_API_KEY, dspy):
+def _(BAMLAdapter, GOOGLE_API_KEY, dspy):
     # Using OpenRouter. Switch to another LLM provider as needed
     lm = dspy.LM(
-        model="openrouter/google/gemini-2.0-flash-001",
-        api_base="https://openrouter.ai/api/v1",
-        api_key=OPENROUTER_API_KEY,
+        model="gemini/gemini-2.5-flash",
+        api_key=GOOGLE_API_KEY,
     )
     dspy.configure(lm=lm, adapter=BAMLAdapter())
     return
@@ -187,15 +199,287 @@ def _(BaseModel, Field):
 
     class Edge(BaseModel):
         label: str = Field(description="Relationship label")
-        from_: Node = Field(alias="from", description="Source node label")
-        to: Node = Field(alias="from", description="Target node label")
+        from_: str = Field(alias="from", description="Source node label")
+        to: str = Field(alias="from", description="Target node label")
         properties: list[Property] | None
 
 
     class GraphSchema(BaseModel):
-        nodes: list[Node]
+        nodes: list[str]
         edges: list[Edge]
     return GraphSchema, Query
+
+
+@app.cell
+def _(Query, dspy):
+    # Few-shot examples
+
+    examples = [
+        dspy.Example(
+            question="Which scholars won Nobel Prizes in Physics?",
+            input_schema=[
+                {
+                    "label": "Scholar", 
+                    "properties": [{"name": "knownName", "type": "STRING"}]
+                }, 
+                {
+                    "label": "Prize", 
+                    "properties": [{"name": "category", "type": "STRING"}, {"name": "awardYear", "type": "INT64"}]
+                }, 
+                {
+                    "label": "WON", 
+                    "properties": []
+                }
+            ],
+            query=Query(
+                query="MATCH (s:Scholar)-[:WON]->(p:Prize) "
+                "WHERE toLower(p.category) = 'physics' "
+                "RETURN s.knownName AS scholar, p.awardYear AS year "
+                "ORDER BY year"
+            ),
+        ).with_inputs("question", "input_schema"),
+        dspy.Example(
+            question="Which scholars were affiliated with the University of Cambridge?",
+            input_schema=[
+                {
+                    "label": "Scholar", 
+                    "properties": [{"name": "knownName", "type": "STRING"}]
+                }, 
+                {
+                    "label": "Institution",
+                    "properties": [{"name": "name", "type": "STRING"}]
+                },
+                {
+                    "label": "AFFILIATED_WITH",
+                    "properties": []
+                }
+            ],
+            query=Query(
+                query="MATCH (s:Scholar)-[:AFFILIATED_WITH]->(i:Institution) "
+                "WHERE toLower(i.name) CONTAINS 'cambridge' "
+                "RETURN s.knownName AS scholar, i.name AS institution"
+            ),
+        ).with_inputs("question", "input_schema"),
+        dspy.Example(
+            question="List female Chemistry laureates.",
+            input_schema= [
+                {
+                    "label": "Scholar", 
+                    "properties": [{"name": "knownName", "type": "STRING"}]
+                }, 
+                {
+                    "label": "Prize", 
+                    "properties": [{"name": "category", "type": "STRING"}, {"name": "awardYear", "type": "INT64"}]
+                }, 
+                {
+                    "label": "WON", 
+                    "properties": []
+                }
+            ],
+            query=Query(
+                query="MATCH (s:Scholar)-[:WON]->(p:Prize) "
+                "WHERE toLower(p.category) = 'chemistry' "
+                "AND toLower(s.gender) = 'female' "
+                "RETURN s.knownName AS laureate, p.awardYear AS year"
+            ),
+        ).with_inputs("question", "input_schema"),
+        dspy.Example(
+            question="How many laureates won prizes in each category?",
+            input_schema=[
+                {
+                    "label": "Scholar", 
+                    "properties": []
+                }, 
+                {
+                    "label": "Prize", 
+                    "properties": [{"name": "category", "type": "STRING"}]
+                }, 
+                {
+                    "label": "WON", 
+                    "properties": []
+                }
+            ],
+            query=Query(
+                query="MATCH (s:Scholar)-[:WON]->(p:Prize) "
+                "RETURN toLower(p.category) AS category, "
+                "COUNT(DISTINCT s) AS total "
+                "ORDER BY total DESC"
+            ),
+        ).with_inputs("question", "input_schema"),
+        dspy.Example(
+            question =  "Which scholars have not won any prize?",
+            input_schema =  [
+                {
+                    "label": "Scholar", 
+                    "properties": [{"name": "fullName", "type": "STRING"}]
+                }, 
+                {
+                    "label": "Prize", 
+                    "properties": []
+                }, 
+                {
+                    "label": "WON", 
+                    "properties": []
+                }
+            ], 
+            query =  Query(query="MATCH (s:Scholar) WHERE NOT (s)-[:WON]->(:Prize) RETURN s.fullName")
+        ).with_inputs("question", "input_schema"),
+        dspy.Example(
+            question =  "Find scholars who died before 1950 and won a prize.",
+            input_schema =  [
+                {
+                    "label": "Scholar", 
+                     "properties": [{"name": "fullName", "type": "STRING"}, {"name": "deathDate", "type": "STRING"}]
+                },
+                {
+                    "label": "Prize", 
+                     "properties": []
+                },
+                {
+                    "label": "WON",
+                    "properties": []
+                }
+            ],
+            query =  Query(query="MATCH (s:Scholar)-[:WON]->(p:Prize) WHERE s.deathDate < '1950-01-01' RETURN DISTINCT s.fullName")
+        ).with_inputs("question", "input_schema"),
+        dspy.Example(
+            question =  "Which scholars have won more than one prize?", 
+            input_schema =  [
+                {
+                    "label": "Scholar",
+                    "properties": [{"name": "fullName", "type": "STRING"}]
+                }, 
+                {
+                    "label": "Prize", 
+                    "properties": []
+                }, 
+                {
+                    "label": "WON", 
+                    "properties": []
+                }
+            ], 
+            query =  Query(query="MATCH (s:Scholar)-[w:WON]->(p:Prize) WITH s, COUNT(p) AS prizeCount WHERE prizeCount > 1 RETURN s.fullName, prizeCount")
+        ).with_inputs("question", "input_schema"),
+        dspy.Example(
+            question =  "How many prizes were awarded in total after the year 2015?", 
+            input_schema =  [
+                {
+                    "label": "Prize",
+                    "properties": [{"name": "prize_id", "type": "STRING"}, {"name": "awardYear", "type": "INT64"}]
+                }
+            ], 
+            query =  Query(query="MATCH (p:Prize) WHERE p.awardYear > 2015 RETURN COUNT(p)")
+        ).with_inputs("question", "input_schema"),
+        dspy.Example(
+            question =  "Find all prize categories awarded in 1901.", 
+            input_schema =  [
+                {
+                    "label": "Prize", 
+                    "properties": [{"name": "awardYear", "type": "INT64"}, {"name": "category", "type": "STRING"}]
+                }
+            ], 
+            query =  Query(query="MATCH (p:Prize) WHERE p.awardYear = 1901 RETURN DISTINCT p.category")
+        ).with_inputs("question", "input_schema"),
+        dspy.Example(
+            question =  "What was the motivation for the 'Peace' prize in 2014?", 
+            input_schema =  [
+                {
+                    "label": "Prize", 
+                    "properties": [{"name": "awardYear", "type": "INT64"}, {"name": "category", "type": "STRING"}, {"name": "motivation", "type": "STRING"}]
+                }
+            ],
+            query =  Query(query="MATCH (p:Prize) WHERE p.awardYear = 2014 AND p.category = 'Peace' RETURN p.motivation")
+        ).with_inputs("question", "input_schema"),
+        dspy.Example(
+            question =  "How many scholars won a prize in 'Literature'?", 
+            input_schema =  [
+                {
+                    "label": "Scholar", 
+                    "properties": []
+                }, 
+                {
+                    "label": "Prize", 
+                    "properties": [{"name": "category", "type": "STRING"}]
+                }, 
+                {
+                    "label": "WON", 
+                    "properties": []
+                }
+            ], 
+            query =  Query(query="MATCH (s:Scholar)-[:WON]->(p:Prize) WHERE p.category = 'Literature' RETURN COUNT(DISTINCT s)")
+        ).with_inputs("question", "input_schema"),
+        dspy.Example(
+            question =  "When was the scholar 'Max Planck' born?", 
+            input_schema =  [
+                {
+                    "label": "Scholar", 
+                    "properties": [{"name": "knownName", "type": "STRING"}, {"name": "birthDate", "type": "STRING"}]
+                }
+            ], 
+            query =  Query(query="MATCH (s:Scholar) WHERE s.knownName = 'Max Planck' RETURN s.birthDate")
+        ).with_inputs("question", "input_schema"),
+        dspy.Example(
+            question =  "Find the total adjusted prize amount awarded for 'Chemistry'.", 
+            input_schema =  [
+                {
+                    "label": "Prize", 
+                    "properties": [{"name": "category", "type": "STRING"}, {"name": "prizeAmountAdjusted", "type": "INT64"}]
+                }
+            ], 
+            query =  Query(query="MATCH (p:Prize) WHERE p.category = 'Chemistry' RETURN SUM(p.prizeAmountAdjusted)")
+        ).with_inputs("question", "input_schema"),
+        dspy.Example(
+            question =  "List all prizes won by 'Marie Curie'.", 
+            input_schema =  [
+                {
+                    "label": "Scholar", 
+                    "properties": [{"name": "knownName", "type": "STRING"}]}, 
+                {
+                    "label": "Prize",
+                    "properties": [{"name": "category", "type": "STRING"}, {"name": "awardYear", "type": "INT64"}]
+                }, 
+                {
+                    "label": "WON", 
+                    "properties": []
+                }
+            ], 
+            query =  Query(query="MATCH (s:Scholar)-[:WON]->(p:Prize) WHERE s.knownName = 'Marie Curie' RETURN p.category, p.awardYear")
+        ).with_inputs("question", "input_schema")
+    ]
+    return (examples,)
+
+
+@app.cell
+def _(examples):
+    [str(e.toDict()) for e in examples]
+    return
+
+
+@app.cell
+def _(kuzu, re):
+    def postprocess_cypher(cypher: str) -> str:
+        """Normalize whitespace and enforce lowercase string comparisons."""
+        q = re.sub(r"\s+", " ", cypher).strip().rstrip(";")
+
+        def _norm(m: re.Match) -> str:
+            left, op, quote, val = m.group(1), m.group(2), m.group(3), m.group(4)
+            return f"toLower({left}) {op} {quote}{val.lower()}{quote}"
+
+        q = re.sub(
+            r"\b([a-zA-Z0-9_.]+)\s*(=|CONTAINS)\s*(['\"])([^'\"]+)\3",
+            _norm,
+            q,
+            flags=re.IGNORECASE,
+        )
+        return q
+
+    def validate_cypher(conn: kuzu.Connection, cypher: str) -> tuple[bool, str]:
+        try:
+            conn.execute(f"EXPLAIN {cypher}")
+            return True, ""
+        except RuntimeError as e:
+            return False, str(e)
+    return postprocess_cypher, validate_cypher
 
 
 @app.cell
@@ -205,8 +489,13 @@ def _(
     KuzuDatabaseManager,
     PruneSchema,
     Query,
+    RepairText2Cypher,
+    SentenceTransformer,
     Text2Cypher,
     dspy,
+    examples,
+    postprocess_cypher,
+    validate_cypher,
 ):
     class GraphRAG(dspy.Module):
         """
@@ -214,17 +503,25 @@ def _(
         on the Kuzu database, to generate a natural language response.
         """
 
-        def __init__(self):
+        def __init__(self, sentence_model, top_k):
             self.prune = dspy.Predict(PruneSchema)
             self.text2cypher = dspy.ChainOfThought(Text2Cypher)
             self.generate_answer = dspy.ChainOfThought(AnswerQuestion)
+            self.repair = dspy.ChainOfThought(RepairText2Cypher)
+            self.generate_answer = dspy.ChainOfThought(AnswerQuestion)
+
+            self.embedder = dspy.Embedder(sentence_model.encode)
+            self.search = dspy.retrievers.Embeddings(embedder=self.embedder, corpus=[str(e.toDict()) for e in examples], k=top_k)
+
+            self._last_debug: dict[str, Any] = {}
 
         def get_cypher_query(self, question: str, input_schema: str) -> Query:
             prune_result = self.prune(question=question, input_schema=input_schema)
             schema = prune_result.pruned_schema
-            text2cypher_result = self.text2cypher(question=question, input_schema=schema)
+            context = self.search(question).passages
+            text2cypher_result = self.text2cypher(question=question, context=context, input_schema=schema)
             cypher_query = text2cypher_result.query
-            return cypher_query
+            return cypher_query, context
 
         def run_query(
             self, db_manager: KuzuDatabaseManager, question: str, input_schema: str
@@ -232,15 +529,46 @@ def _(
             """
             Run a query synchronously on the database.
             """
-            result = self.get_cypher_query(question=question, input_schema=input_schema)
+            result, context = self.get_cypher_query(question=question, input_schema=input_schema)
+            print(f'DEBUG RESULT: {result}')
             query = result.query
             try:
+                valid = False
+                max_attempts = 5
+                attempts = 0
+                valid, e_msg = validate_cypher(conn=db_manager.conn, cypher=query)
+                attempts_log: list[dict[str, Any]] = [
+                    {"stage": "gen", "query": query, "valid": valid, "error": e_msg}
+                ]
+                while not valid and attempts < max_attempts:
+                    repair_result = self.repair(
+                        question=question,
+                        input_schema=input_schema, 
+                        previous_query=query,
+                        error_message=e_msg
+                    )
+                    query = repair_result.repaired.query
+                    print(f'DEBUG: valid: {valid} {repair_result} | {query} | {e_msg}')
+                    valid, e_msg = validate_cypher(conn=db_manager.conn, cypher=query)
+                    attempts += 1
+                    attempts_log.append(
+                        {"stage": "repair", "query": query, "valid": valid, "error": e_msg}
+                    )
+
+                processed_query = postprocess_cypher(cypher=query)
                 # Run the query on the database
                 result = db_manager.conn.execute(query)
                 results = [item for row in result for item in row]
             except RuntimeError as e:
                 print(f"Error running query: {e}")
                 results = None
+
+            self._last_debug = {
+                "picked_exemplars": context,
+                "attempts": attempts_log,
+                "explain_ok": valid,
+                "last_error": None if valid else e_msg,
+            }
             return query, results
 
         def forward(self, db_manager: KuzuDatabaseManager, question: str, input_schema: str):
@@ -278,7 +606,8 @@ def _(
 
     def run_graph_rag(questions: list[str], db_manager: KuzuDatabaseManager) -> list[Any]:
         schema = str(db_manager.get_schema_dict)
-        rag = GraphRAG()
+        sentence_model = SentenceTransformer("google/embeddinggemma-300m")
+        rag = GraphRAG(sentence_model, top_k=2)
         # Run pipeline
         results = []
         for question in questions:
@@ -290,14 +619,15 @@ def _(
 
 
 @app.cell
-def _():
+def _(dspy):
+    dspy.inspect_history(n=2)
     return
 
 
 @app.cell
 def _():
     import marimo as mo
-    import os
+    import os, re
     from textwrap import dedent
     from typing import Any
 
@@ -307,18 +637,22 @@ def _():
     from dspy.adapters.baml_adapter import BAMLAdapter
     from pydantic import BaseModel, Field
 
+    from sentence_transformers import SentenceTransformer
+
     load_dotenv()
 
-    OPENROUTER_API_KEY = os.environ.get("OPENROUTER_API_KEY")
+    GOOGLE_API_KEY = os.environ.get("GOOGLE_API_KEY")
     return (
         Any,
         BAMLAdapter,
         BaseModel,
         Field,
-        OPENROUTER_API_KEY,
+        GOOGLE_API_KEY,
+        SentenceTransformer,
         dspy,
         kuzu,
         mo,
+        re,
     )
 
 
