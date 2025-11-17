@@ -38,7 +38,7 @@ def _(KuzuDatabaseManager, mo, run_graph_rag, text_ui):
     question = text_ui.value
 
     with mo.status.spinner(title="Generating answer...") as _spinner:
-        result = run_graph_rag([question], db_manager)[0]
+        result = run_graph_rag([question, question], db_manager)[0]
 
     query = result['query']
     answer = result['answer'].response
@@ -48,6 +48,11 @@ def _(KuzuDatabaseManager, mo, run_graph_rag, text_ui):
 @app.cell
 def _(answer, mo, query):
     mo.hstack([mo.md(f"""### Query\n```{query}```"""), mo.md(f"""### Answer\n{answer}""")])
+    return
+
+
+@app.cell
+def _():
     return
 
 
@@ -492,9 +497,12 @@ def _(
     RepairText2Cypher,
     SentenceTransformer,
     Text2Cypher,
+    cachetools,
     dspy,
     examples,
+    json,
     postprocess_cypher,
+    text2cypher_cache,
     validate_cypher,
 ):
     class GraphRAG(dspy.Module):
@@ -515,13 +523,24 @@ def _(
 
             self._last_debug: dict[str, Any] = {}
 
+            self.lru_cache = cachetools.LRUCache(maxsize=128)
+
         def get_cypher_query(self, question: str, input_schema: str) -> Query:
             prune_result = self.prune(question=question, input_schema=input_schema)
             schema = prune_result.pruned_schema
-            context = self.search(question).passages
-            text2cypher_result = self.text2cypher(question=question, context=context, input_schema=schema)
-            cypher_query = text2cypher_result.query
-            return cypher_query, context
+
+            schema_str = json.dumps(input_schema)
+            cache_key = hash(f"{question}|{schema_str}")
+
+            if cache_key in self.lru_cache:
+                print(f"CACHE HIT: {question} | {input_schema}")
+                query = text2cypher_cache[cache_key]
+                return query, ["Cache hit."]
+            else:
+                context = self.search(question).passages
+                text2cypher_result = self.text2cypher(question=question, context=context, input_schema=schema)
+                cypher_query = text2cypher_result.query
+                return cypher_query, context
 
         def run_query(
             self, db_manager: KuzuDatabaseManager, question: str, input_schema: str
@@ -638,6 +657,8 @@ def _():
     from pydantic import BaseModel, Field
 
     from sentence_transformers import SentenceTransformer
+    import cachetools
+    import json
 
     load_dotenv()
 
@@ -649,7 +670,9 @@ def _():
         Field,
         GOOGLE_API_KEY,
         SentenceTransformer,
+        cachetools,
         dspy,
+        json,
         kuzu,
         mo,
         re,
