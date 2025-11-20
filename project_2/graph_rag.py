@@ -659,9 +659,16 @@ def _():
     import cachetools
     import json
 
+    from phoenix.otel import register
+
     load_dotenv()
 
     GOOGLE_API_KEY = os.environ.get("GOOGLE_API_KEY")
+
+    tracer_provider = register(
+      project_name="my-graph-rag-app",
+      auto_instrument=True
+    )
     return (
         Any,
         BAMLAdapter,
