@@ -502,7 +502,6 @@ def _(
     examples,
     json,
     postprocess_cypher,
-    text2cypher_cache,
     validate_cypher,
 ):
     class GraphRAG(dspy.Module):
@@ -526,20 +525,20 @@ def _(
             self.lru_cache = cachetools.LRUCache(maxsize=128)
 
         def get_cypher_query(self, question: str, input_schema: str) -> Query:
-            prune_result = self.prune(question=question, input_schema=input_schema)
-            schema = prune_result.pruned_schema
-
             schema_str = json.dumps(input_schema)
             cache_key = hash(f"{question}|{schema_str}")
 
             if cache_key in self.lru_cache:
                 print(f"CACHE HIT: {question} | {input_schema}")
-                query = text2cypher_cache[cache_key]
+                query = self.lru_cache[cache_key]
                 return query, ["Cache hit."]
             else:
+                prune_result = self.prune(question=question, input_schema=input_schema)
+                schema = prune_result.pruned_schema
                 context = self.search(question).passages
                 text2cypher_result = self.text2cypher(question=question, context=context, input_schema=schema)
                 cypher_query = text2cypher_result.query
+                self.lru_cache[cache_key] = cypher_query
                 return cypher_query, context
 
         def run_query(
