@@ -34,3 +34,6 @@ This project implements efficient pattern detection over Citi Bike data streams 
 - Experiments were conducted on Ubuntu 22.04 LTS under WSL2 with an AMD Ryzen 7 7840HS CPU and 7.4 GiB RAM allocated to WSL.
 - Synthetic test data with planted matches is included for evaluation.
 - See the project report for detailed performance results and discussion. And READMEs for data ingestion and pattern analyser.
+
+# Project 2: GraphRAG
+In case you receive an error from the embedding model use, run `hf auth login` and visit https://huggingface.co/google/embeddinggemma-300m to add permissions to use the model. Also, check the boxes of "Read access to contents of all public gated repos you can access" and "Make calls to Inference Providers" from your HF Access Token Permissions
