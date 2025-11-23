@@ -25,34 +25,40 @@ def _(mo):
 
 
 @app.cell
+def _():
+    test_questions = [
+        "Name scholars who worked along with the female laureates?",
+        "Who are the top 10 most awarded laureates in prize money?",
+        "Who are the mentees of Albert Einstein?",
+        "Who have won the Nobel Prize in Economics and are from Europe?",
+        "Which scholars won prizes in Medicine before 1980 and are affiliated with european universities?"
+    ]
+    return (test_questions,)
+
+
+@app.cell
 def _(text_ui):
     text_ui
     return
 
 
 @app.cell
-def _(KuzuDatabaseManager, mo, run_graph_rag, text_ui):
+def _(KuzuDatabaseManager, mo, run_graph_rag, test_questions, text_ui):
     db_name = "nobel.kuzu"
     db_manager = KuzuDatabaseManager(db_name)
 
     question = text_ui.value
 
     with mo.status.spinner(title="Generating answer...") as _spinner:
-        result = run_graph_rag([question, question], db_manager)[0]
-
-    query = result['query']
-    answer = result['answer'].response
-    return answer, query
+        results = run_graph_rag([*test_questions, *test_questions], db_manager)
+    return (results,)
 
 
 @app.cell
-def _(answer, mo, query):
+def _(mo, results):
+    query = results[0]['query']
+    answer = results[0]['answer'].response
     mo.hstack([mo.md(f"""### Query\n```{query}```"""), mo.md(f"""### Answer\n{answer}""")])
-    return
-
-
-@app.cell
-def _():
     return
 
 
@@ -558,6 +564,8 @@ def _(
                 attempts_log: list[dict[str, Any]] = [
                     {"stage": "gen", "query": query, "valid": valid, "error": e_msg}
                 ]
+                schema_str = json.dumps(input_schema)
+                cache_key = hash(f"{question}|{schema_str}")
                 while not valid and attempts < max_attempts:
                     repair_result = self.repair(
                         question=question,
@@ -566,6 +574,7 @@ def _(
                         error_message=e_msg
                     )
                     query = repair_result.repaired.query
+                    self.lru_cache[cache_key] = query
                     print(f'DEBUG: valid: {valid} {repair_result} | {query} | {e_msg}')
                     valid, e_msg = validate_cypher(conn=db_manager.conn, cypher=query)
                     attempts += 1
