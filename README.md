@@ -21,7 +21,15 @@ This project implements efficient pattern detection over Citi Bike data streams 
 ## Usage
 
 1. **Install dependencies:**  
-   See `requirements.txt` in each component directory.
+   We recommend using [`uv`](https://github.com/astral-sh/uv) for fast dependency management and script running.  
+   First, install `uv` (if not already installed):
+   ```bash
+   pip install uv
+   ```
+   Then install dependencies:
+   ```bash
+   uv pip install -r requirements.txt
+   ```
 
 2. **Start the system:**  
    `docker-compose.yml`
@@ -36,4 +44,60 @@ This project implements efficient pattern detection over Citi Bike data streams 
 - See the project report for detailed performance results and discussion. And READMEs for data ingestion and pattern analyser.
 
 # Project 2: GraphRAG
-In case you receive an error from the embedding model use, run `hf auth login` and visit https://huggingface.co/google/embeddinggemma-300m to add permissions to use the model. Also, check the boxes of "Read access to contents of all public gated repos you can access" and "Make calls to Inference Providers" from your HF Access Token Permissions
+## Features
+
+- **Graph Database (Kuzu):** Stores enriched Nobel laureate and mentorship data, including categories, years, institutions, and historical scholar relationships.
+- **Text2Cypher with DSPy:** Translates natural language questions into Cypher queries using dynamic few-shot selection and self-repair.
+- **LRU Caching:** Efficiently caches query results and schema pruning steps for fast repeated queries.
+- **Self-Repair Loop:** Automatically validates and repairs generated Cypher queries using dry-run EXPLAIN.
+- **Performance Benchmarking:** Measures and visualizes pipeline latency at each stage.
+- **Interactive Marimo UI:** Lets users enter questions, view generated queries, and see answers in real time.
+
+## How it Works
+
+1. **User Input:** Enter a question in the Marimo app (e.g., "Which Physics laureates were affiliated with University of Cambridge?").
+2. **Query Generation:** DSPy selects relevant exemplars and generates a Cypher query, with validation and repair if needed.
+3. **Graph Query:** The query is executed on the Kuzu database, retrieving structured answers.
+4. **Caching:** Results are cached for efficiency, keyed by question and schema.
+5. **Answer Display:** The Marimo UI shows the Cypher query, answer, and debug info.
+
+## Usage
+
+1. **Install dependencies:**  
+   See `requirements.txt` in the project directory.
+
+2. **Start the Marimo UI:**  
+   ```bash
+   uv run marimo run graph_rag.py
+   ```
+   or  
+   ```bash
+   marimo run graph_rag.py
+   ```
+
+3. **Authentication for Embedding Models:**  
+   In case you receive an error from the embedding model use, run `hf auth login` and visit https://huggingface.co/google/embeddinggemma-300m to add permissions to use the model. Also, check the boxes of "Read access to contents of all public gated repos you can access" and "Make calls to Inference Providers" from your HF Access Token Permissions
+
+## Our Contributions
+
+- Dynamic few-shot selection for Text2Cypher.
+- LRU cache for query and schema pruning.
+- Self-repair loop for Cypher validation.
+- Performance benchmarking and timing breakdown.
+- Integration of Kuzu, DSPy, and Marimo for a seamless graph RAG workflow.
+
+## Data
+
+- Nobel laureates and mentorship relationships (1901–2021), enriched with official Nobel Prize API metadata.
+- Graph schema includes scholars, prizes, institutions, and mentorship edges.
+
+## References
+
+- [Kuzu Graph Database](https://kuzudb.com/)
+- [DSPy](https://github.com/stanfordnlp/dspy)
+- [Marimo](https://github.com/marimo-team/marimo)
+- [Hugging Face](https://huggingface.co/)
+
+---
+
+For more details, see the project report and code comments.
