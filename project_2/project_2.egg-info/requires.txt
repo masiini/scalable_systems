@@ -1,0 +1,7 @@
+dspy>=3.0.1
+kuzu>=0.11.1
+marimo>=0.14.17
+polars>=1.32.3
+pyarrow>=21.0.0
+python-dotenv>=1.1.1
+sentence-transformers>=2.2.2

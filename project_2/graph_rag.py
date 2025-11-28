@@ -20,20 +20,8 @@ def _(mo):
 
 @app.cell
 def _(mo):
-    text_ui = mo.ui.text(value="Which scholars won prizes in Physics and were affiliated with University of Cambridge?", full_width=True)
+    text_ui = mo.ui.text(value="", full_width=True)
     return (text_ui,)
-
-
-@app.cell
-def _():
-    test_questions = [
-        "Name scholars who worked along with the female laureates?",
-        "Who are the top 10 most awarded laureates in prize money?",
-        "Who are the mentees of Albert Einstein?",
-        "Who have won the Nobel Prize in Economics and are from Europe?",
-        "Which scholars won prizes in Medicine before 1980 and are affiliated with european universities?"
-    ]
-    return (test_questions,)
 
 
 @app.cell
@@ -43,23 +31,150 @@ def _(text_ui):
 
 
 @app.cell
-def _(KuzuDatabaseManager, mo, run_graph_rag, test_questions, text_ui):
+def _(KuzuDatabaseManager, mo, run_graph_rag, text_ui):
     db_name = "nobel.kuzu"
     db_manager = KuzuDatabaseManager(db_name)
 
     question = text_ui.value
+    query = ""
+    answer = ""
 
-    with mo.status.spinner(title="Generating answer...") as _spinner:
-        results = run_graph_rag([*test_questions, *test_questions], db_manager)
-    return (results,)
+    # Only run if the question is not empty
+    if question:
+        with mo.status.spinner(title="Generating answer...") as _spinner:
+            result = run_graph_rag([question], db_manager)[0]
+
+        if result:
+            query = result.get('query', "")
+            answer_obj = result.get('answer')
+            if answer_obj:
+                answer = answer_obj.response
+    return answer, query
 
 
 @app.cell
-def _(mo, results):
-    query = results[0]['query']
-    answer = results[0]['answer'].response
+def _(answer, mo, query):
     mo.hstack([mo.md(f"""### Query\n```{query}```"""), mo.md(f"""### Answer\n{answer}""")])
     return
+
+
+# # Evaluation cell for Task 1
+# @app.cell
+# def _(
+#     db_manager,
+#     examples_test_1,
+#     mo,
+#     pd,
+#     postprocess_cypher,
+#     run_graph_rag,
+#     time,
+# ):
+#     # 10 req/min
+#     PER_EXAMPLE_DELAY_S = 7.0
+# 
+#     def is_rate_limit_error(e: Exception) -> bool:
+#         msg = str(e).lower()
+#         return (
+#             "429" in msg
+#             or "rate limit" in msg
+#             or "resource_exhausted" in msg
+#             or "quota" in msg
+#         )
+# 
+#     def eval_task1(testset, db_manager):
+#         rows = []
+# 
+#         def normalize_for_eval(q: str) -> str:
+#             if not q:
+#                 return ""
+#             q = postprocess_cypher(q)
+#             # Canonicalize variable names: (s1:Scholar) -> (v:Scholar)
+#             q = re.sub(r"\([a-zA-Z_][a-zA-Z0-9_]*\s*:", "(v:", q)
+#             q = re.sub(r"\s+", " ", q).strip().rstrip(";")
+#             return q
+# 
+#         # ---- run ALL questions in one GraphRAG instantiation ----
+#         questions = [ex.question for ex in testset]
+# 
+#         t0_total = time.perf_counter()
+#         try:
+#             outputs = run_graph_rag(questions, db_manager)  # one SentenceTransformer load
+#             batch_err = None
+#         except Exception as e:
+#             outputs = []
+#             batch_err = str(e)
+# 
+#         t1_total = time.perf_counter()
+#         total_latency = t1_total - t0_total
+#         per_example_latency = total_latency / len(testset) if testset else 0.0
+# 
+#         # ---- build rows, stop early on rate limit if needed ----
+#         for ex, out in zip(testset, outputs):
+#             question = ex.question
+#             gold_query = ex.query.query
+# 
+#             pred_query = out.get("query", "") if out else ""
+#             err = out.get("error") if isinstance(out, dict) else None
+# 
+#             norm_gold = normalize_for_eval(gold_query)
+#             norm_pred = normalize_for_eval(pred_query)
+# 
+#             rows.append(
+#                 {
+#                     "question": question,
+#                     "gold_query": gold_query,
+#                     "pred_query": pred_query,
+#                     "normalized_match": norm_gold == norm_pred,
+#                     # latency is now an estimate (batch/len) since we run as one batch
+#                     "latency_s": per_example_latency,
+#                     "error": err,
+#                 }
+#             )
+# 
+#         # If the whole batch failed, still return a single row explaining why
+#         if batch_err and not rows:
+#             rows.append(
+#                 {
+#                     "question": "(batch)",
+#                     "gold_query": "",
+#                     "pred_query": "",
+#                     "normalized_match": False,
+#                     "latency_s": total_latency,
+#                     "error": batch_err,
+#                 }
+#             )
+# 
+#         return pd.DataFrame(rows)
+# 
+#     with mo.status.spinner(title="Evaluating Task 1..."):
+#         df = eval_task1(examples_test_1, db_manager)
+# 
+#     # Summarize partial/complete run
+#     correct = int(df["normalized_match"].sum())
+#     total_done = len(df)
+#     total_all = len(examples_test_1)
+#     acc = correct / total_done if total_done else 0.0
+#     mean_lat = float(df["latency_s"].mean()) if total_done else 0.0
+# 
+#     stopped_early = total_done < total_all
+#     stop_note = " (stopped early due to rate limit)" if stopped_early else ""
+# 
+#     mo.vstack(
+#         [
+#             mo.md(
+#                 f"""
+#                     {stop_note}
+# 
+#                     - **Completed:** {total_done}/{total_all}
+#                     - **Accuracy (on completed):** {correct}/{total_done} = **{acc:.1%}**
+#                     - **Mean latency:** **{mean_lat:.3f}s**
+#                 """
+#             ),
+#             df,
+#         ]
+#     )
+# 
+#     return df
 
 
 @app.cell
@@ -211,7 +326,7 @@ def _(BaseModel, Field):
     class Edge(BaseModel):
         label: str = Field(description="Relationship label")
         from_: str = Field(alias="from", description="Source node label")
-        to: str = Field(alias="from", description="Target node label")
+        to: str = Field(alias="to", description="Target node label")
         properties: list[Property] | None
 
 
@@ -457,7 +572,84 @@ def _(Query, dspy):
             query =  Query(query="MATCH (s:Scholar)-[:WON]->(p:Prize) WHERE s.knownName = 'Marie Curie' RETURN p.category, p.awardYear")
         ).with_inputs("question", "input_schema")
     ]
-    return (examples,)
+
+    examples_test_1 = [
+        # 1. Basic category filter
+        dspy.Example(
+            question="Which scholars won Nobel Prizes in Physics?",
+            input_schema=[{"label":"Scholar","properties":[{"name":"knownName","type":"STRING"}]},
+                        {"label":"Prize","properties":[{"name":"category","type":"STRING"},{"name":"awardYear","type":"INT64"}]},
+                        {"label":"WON","properties":[]}],
+            query=Query(query=
+                "MATCH (s:Scholar)-[:WON]->(p:Prize) "
+                "WHERE toLower(p.category) = 'physics' "
+                "RETURN s.knownName AS scholar, p.awardYear AS year "
+                "ORDER BY year"
+            ),
+        ).with_inputs("question","input_schema"),
+
+        # 2. Institution string match
+        dspy.Example(
+            question="Which scholars were affiliated with the University of Cambridge?",
+            input_schema=[{"label":"Scholar","properties":[{"name":"knownName","type":"STRING"}]},
+                        {"label":"Institution","properties":[{"name":"name","type":"STRING"}]},
+                        {"label":"AFFILIATED_WITH","properties":[]}],
+            query=Query(query=
+                "MATCH (s:Scholar)-[:AFFILIATED_WITH]->(i:Institution) "
+                "WHERE toLower(i.name) CONTAINS 'cambridge' "
+                "RETURN DISTINCT s.knownName AS scholar, i.name AS institution"
+            ),
+        ).with_inputs("question","input_schema"),
+
+        # 3. Two constraints (category + institution)
+        dspy.Example(
+            question="Which Physics laureates were affiliated with University of Cambridge?",
+            input_schema=[{"label":"Scholar","properties":[{"name":"knownName","type":"STRING"}]},
+                        {"label":"Prize","properties":[{"name":"category","type":"STRING"},{"name":"awardYear","type":"INT64"}]},
+                        {"label":"Institution","properties":[{"name":"name","type":"STRING"}]},
+                        {"label":"WON","properties":[]},
+                        {"label":"AFFILIATED_WITH","properties":[]}],
+            query=Query(query=
+                "MATCH (s:Scholar)-[:WON]->(p:Prize), (s)-[:AFFILIATED_WITH]->(i:Institution) "
+                "WHERE toLower(p.category) = 'physics' "
+                "AND toLower(i.name) CONTAINS 'cambridge' "
+                "RETURN DISTINCT s.knownName AS scholar, p.awardYear AS year "
+                "ORDER BY year"
+            ),
+        ).with_inputs("question","input_schema"),
+
+        # 4. Aggregation / count per category
+        dspy.Example(
+            question="How many laureates won prizes in each category?",
+            input_schema=[{"label":"Scholar","properties":[]},
+                        {"label":"Prize","properties":[{"name":"category","type":"STRING"}]},
+                        {"label":"WON","properties":[]}],
+            query=Query(query=
+                "MATCH (s:Scholar)-[:WON]->(p:Prize) "
+                "RETURN toLower(p.category) AS category, COUNT(DISTINCT s) AS total "
+                "ORDER BY total DESC"
+            ),
+        ).with_inputs("question","input_schema"),
+
+        # 5. Simple temporal count
+        dspy.Example(
+            question="How many prizes were awarded after 2015?",
+            input_schema=[{"label":"Prize","properties":[{"name":"awardYear","type":"INT64"}]}],
+            query=Query(query=
+                "MATCH (p:Prize) WHERE p.awardYear > 2015 RETURN COUNT(p) AS total"
+            ),
+        ).with_inputs("question","input_schema"),
+
+        # 6. Property lookup by name
+        dspy.Example(
+            question="When was Max Planck born?",
+            input_schema=[{"label":"Scholar","properties":[{"name":"knownName","type":"STRING"},{"name":"birthDate","type":"STRING"}]}],
+            query=Query(query=
+                "MATCH (s:Scholar) WHERE s.knownName = 'Max Planck' RETURN s.birthDate AS birthDate"
+            ),
+        ).with_inputs("question","input_schema"),
+    ]
+    return (examples, examples_test_1)
 
 
 @app.cell
@@ -522,9 +714,29 @@ def _(
             self.generate_answer = dspy.ChainOfThought(AnswerQuestion)
             self.repair = dspy.ChainOfThought(RepairText2Cypher)
             self.generate_answer = dspy.ChainOfThought(AnswerQuestion)
+            self.use_dynamic_shots = True
+            self.use_repair = True
+            self.use_postprocess = True
 
-            self.embedder = dspy.Embedder(sentence_model.encode)
-            self.search = dspy.retrievers.Embeddings(embedder=self.embedder, corpus=[str(e.toDict()) for e in examples], k=top_k)
+            def encode_batch(texts):
+                if isinstance(texts, str):
+                    texts = [texts]
+                embs = sentence_model.encode(
+                    texts,
+                    normalize_embeddings=True,
+                    convert_to_numpy=True
+                )
+                return embs.tolist()
+
+            self.embedder = dspy.Embedder(encode_batch)
+            def _render_exemplar(e):
+                return f"Q: {e.question}\nA (Cypher): {e.query.query}"
+
+            self.search = dspy.retrievers.Embeddings(
+                embedder=self.embedder,
+                corpus=[_render_exemplar(e) for e in examples],
+                k=top_k
+            )
 
             self._last_debug: dict[str, Any] = {}
 
@@ -541,8 +753,16 @@ def _(
             else:
                 prune_result = self.prune(question=question, input_schema=input_schema)
                 schema = prune_result.pruned_schema
-                context = self.search(question).passages
-                text2cypher_result = self.text2cypher(question=question, context=context, input_schema=schema)
+                if self.use_dynamic_shots:
+                    context = self.search(question).passages
+                else:
+                    context = []
+
+                text2cypher_result = self.text2cypher(
+                    question=question,
+                    context=context,
+                    input_schema=schema
+                )
                 cypher_query = text2cypher_result.query
                 self.lru_cache[cache_key] = cypher_query
                 return cypher_query, context
@@ -557,35 +777,47 @@ def _(
             print(f'DEBUG RESULT: {result}')
             query = result.query
             try:
-                valid = False
-                max_attempts = 5
-                attempts = 0
-                valid, e_msg = validate_cypher(conn=db_manager.conn, cypher=query)
-                attempts_log: list[dict[str, Any]] = [
-                    {"stage": "gen", "query": query, "valid": valid, "error": e_msg}
-                ]
-                schema_str = json.dumps(input_schema)
-                cache_key = hash(f"{question}|{schema_str}")
-                while not valid and attempts < max_attempts:
-                    repair_result = self.repair(
-                        question=question,
-                        input_schema=input_schema, 
-                        previous_query=query,
-                        error_message=e_msg
-                    )
-                    query = repair_result.repaired.query
-                    self.lru_cache[cache_key] = query
-                    print(f'DEBUG: valid: {valid} {repair_result} | {query} | {e_msg}')
+                attempts_log: list[dict[str, Any]] = []
+
+                if self.use_repair:
+                    valid = False
+                    max_attempts = 5
+                    attempts = 0
+
                     valid, e_msg = validate_cypher(conn=db_manager.conn, cypher=query)
-                    attempts += 1
                     attempts_log.append(
-                        {"stage": "repair", "query": query, "valid": valid, "error": e_msg}
+                        {"stage": "gen", "query": query, "valid": valid, "error": e_msg}
                     )
 
-                processed_query = postprocess_cypher(cypher=query)
+                    while not valid and attempts < max_attempts:
+                        repair_result = self.repair(
+                            question=question,
+                            input_schema=input_schema,
+                            previous_query=query,
+                            error_message=e_msg
+                        )
+                        query = repair_result.repaired.query
+                        valid, e_msg = validate_cypher(conn=db_manager.conn, cypher=query)
+                        attempts += 1
+                        attempts_log.append(
+                            {"stage": "repair", "query": query, "valid": valid, "error": e_msg}
+                        )
+                else:
+                    # baseline
+                    valid, e_msg = True, ""
+                    attempts_log.append({"stage": "gen", "query": query, "valid": True, "error": ""})
+
+                processed_query = (
+                    postprocess_cypher(cypher=query)
+                    if self.use_postprocess
+                    else query
+                )
+
                 # Run the query on the database
-                result = db_manager.conn.execute(query)
-                results = [item for row in result for item in row]
+                result = db_manager.conn.execute(processed_query)
+                cols = result.get_column_names()
+                results = [dict(zip(cols, row)) for row in result]
+
             except RuntimeError as e:
                 print(f"Error running query: {e}")
                 results = None
@@ -632,8 +864,9 @@ def _(
 
 
     def run_graph_rag(questions: list[str], db_manager: KuzuDatabaseManager) -> list[Any]:
+        """Runs the GraphRAG pipeline for a list of questions and returns results."""
         schema = str(db_manager.get_schema_dict)
-        sentence_model = SentenceTransformer("google/embeddinggemma-300m")
+        sentence_model = SentenceTransformer("google/embeddinggemma-300m") # "sentence-transformers/all-MiniLM-L6-v2"
         rag = GraphRAG(sentence_model, top_k=2)
         # Run pipeline
         results = []
@@ -657,6 +890,8 @@ def _():
     import os, re
     from textwrap import dedent
     from typing import Any
+    import time
+    import pandas as pd
 
     import dspy
     import kuzu
@@ -691,6 +926,8 @@ def _():
         kuzu,
         mo,
         re,
+        time,
+        pd,
     )
 
 
